@@ -320,7 +320,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col font-sans selection:bg-cyan-500/20 relative overflow-x-hidden transition-colors duration-300">
+    <div className="min-h-screen bg-slate-200 text-slate-800 flex flex-col font-sans selection:bg-cyan-500/20 relative overflow-x-hidden transition-colors duration-300">
       {/* Ambient Gradient Glows */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0 transition-all duration-700">
         <div className={`absolute top-0 left-1/4 -translate-x-1/2 w-[650px] h-[380px] ${activeProf.theme.glowTop} rounded-full blur-[140px] transition-all duration-700`} />
@@ -513,7 +513,7 @@ export default function App() {
       </main>
 
       {/* Clean Footer */}
-      <footer className="border-t border-slate-200 bg-white py-6 px-4 text-center text-xs text-slate-500 relative z-10 flex flex-col sm:flex-row items-center justify-between max-w-5xl mx-auto w-full transition-colors duration-300">
+      <footer className="border-t border-slate-300 bg-white/90 backdrop-blur-md py-6 px-4 text-center text-xs text-slate-500 relative z-10 flex flex-col sm:flex-row items-center justify-between max-w-5xl mx-auto w-full transition-colors duration-300 rounded-t-2xl shadow-sm mt-8">
         <div className="flex items-center gap-2">
           <BookOpen className={`w-4 h-4 ${activeProf.theme.textAccent} transition-colors duration-300`} />
           <span className="font-semibold text-slate-800">Agentic Mode-AI</span>

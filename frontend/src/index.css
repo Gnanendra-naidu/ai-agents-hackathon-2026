@@ -7,8 +7,8 @@
   
   body {
     font-family: var(--font-sans);
-    background-color: #F8FAFC;
-    color: #1E293B;
+    background-color: #E2E8F0;
+    color: #0F172A;
     min-height: 100vh;
     overflow-x: hidden;
   }

@@ -165,9 +165,9 @@ ${openQuestionsList.map((q) => `- ${q}`).join('\n')}
   };
 
   return (
-    <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-7 shadow-md transition-all space-y-6">
+    <div className="bg-white border border-slate-300 rounded-2xl p-6 sm:p-7 shadow-md transition-all space-y-6">
       {/* 1. Header Bar with Prominent Actions */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-100">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-200">
         <div className="flex items-start gap-3.5">
           <div className="p-3 rounded-xl bg-cyan-50 border border-cyan-200 text-cyan-700 shadow-2xs">
             <FileText className="w-6 h-6" />

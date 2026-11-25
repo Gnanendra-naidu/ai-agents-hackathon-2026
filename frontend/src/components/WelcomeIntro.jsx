@@ -66,9 +66,9 @@ export default function WelcomeIntro({
   if (!isOpen) return null;
 
   return (
-    <div className="relative bg-white border border-slate-200/90 rounded-2xl p-5 sm:p-6 shadow-lg backdrop-blur-xl transition-all duration-300 animate-in fade-in slide-in-from-top-3">
+    <div className="relative bg-white border border-slate-300 rounded-2xl p-5 sm:p-6 shadow-md backdrop-blur-xl transition-all duration-300 animate-in fade-in slide-in-from-top-3">
       {/* Top Banner Row */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200">
         <div className="flex items-center gap-2.5">
           <div className={`p-2 rounded-xl text-white shadow-xs bg-gradient-to-tr ${activeProf.theme.accentGradient}`}>
             <Sparkles className="w-4 h-4" />
