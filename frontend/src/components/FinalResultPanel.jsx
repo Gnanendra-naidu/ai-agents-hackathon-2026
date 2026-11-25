@@ -1,0 +1,250 @@
+import { useState } from 'react';
+import {
+  FileText,
+  Copy,
+  Check,
+  Download,
+  HelpCircle,
+  Lightbulb,
+  BookmarkCheck,
+  Tag,
+  Send,
+  Database,
+  Cpu
+} from 'lucide-react';
+
+export default function FinalResultPanel({
+  report = null,
+  metrics = {
+    subQuestionsVerified: 0,
+    sourcesAnalyzed: 0,
+    conflictsReconciled: 0,
+    estimatedTokens: 0,
+    latencySec: '0.0',
+  },
+  backendStatus = null,
+  persistenceMode = 'memory',
+  onRequestExportApproval = null,
+  onReset,
+}) {
+  const [copied, setCopied] = useState(false);
+
+  if (!report) return null;
+
+  const handleCopy = () => {
+    const formatted = `
+# ${report.title || 'Research Synthesis Report'}
+
+## Executive Summary
+${report.executiveSummary}
+
+## Key Findings
+${report.keyFindings?.map((f, i) => `${i + 1}. ${f.finding} [Sources: ${f.sources?.join(', ')}]`).join('\n')}
+
+## Open Questions & Future Investigations
+${report.openQuestions?.map((q) => `- ${q}`).join('\n')}
+    `.trim();
+
+    navigator.clipboard?.writeText(formatted);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleExportMarkdown = () => {
+    const formatted = `
+# ${report.title || 'Research Synthesis Report'}
+
+## Executive Summary
+${report.executiveSummary}
+
+## Key Findings
+${report.keyFindings?.map((f, i) => `${i + 1}. ${f.finding} [Sources: ${f.sources?.join(', ')}]`).join('\n')}
+
+## Open Questions
+${report.openQuestions?.map((q) => `- ${q}`).join('\n')}
+    `.trim();
+
+    const blob = new Blob([formatted], { type: 'text/markdown;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `research-report-${Date.now()}.md`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  return (
+    <div className="bg-[#111827]/85 border border-cyan-900/60 rounded-2xl p-6 shadow-2xl backdrop-blur-xl transition-all space-y-5">
+      {/* Header Bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-white/[0.08]">
+        <div className="flex items-center gap-3">
+          <div className="p-2.5 rounded-xl bg-cyan-950/90 border border-cyan-600/70 text-cyan-400 shadow-md">
+            <FileText className="w-6 h-6" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h3 className="text-base font-bold text-slate-100">
+                {report.title || 'Structured Research Report'}
+              </h3>
+              {report.audience && (
+                <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-cyan-950/90 text-cyan-300 border border-cyan-700/80 shadow-sm">
+                  Tailored for: {report.audience}
+                </span>
+              )}
+            </div>
+            <p className="text-xs text-slate-400">Deep synthesis verified against knowledge base and academic retrieval.</p>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          {onRequestExportApproval && (
+            <button
+              type="button"
+              onClick={onRequestExportApproval}
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white border border-amber-500/60 transition-all shadow-md active:scale-95"
+            >
+              <Send className="w-3.5 h-3.5" />
+              <span>Export / Publish Verified Report</span>
+            </button>
+          )}
+
+          <button
+            type="button"
+            onClick={handleCopy}
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-medium bg-[#161F33] hover:bg-[#1E293B] text-slate-200 border border-white/[0.08] hover:border-cyan-500/40 transition-colors"
+          >
+            {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-cyan-400" />}
+            <span>{copied ? 'Copied' : 'Copy Markdown'}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleExportMarkdown}
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-cyan-950/80 hover:bg-cyan-900 text-cyan-200 border border-cyan-700/80 transition-colors shadow-sm"
+          >
+            <Download className="w-3.5 h-3.5 text-cyan-400" />
+            <span>Export (.md)</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Real Live Backend Status Strip */}
+      <div className="flex flex-wrap items-center justify-between gap-2 p-2.5 rounded-xl bg-[#090D16]/90 border border-cyan-900/50 text-xs">
+        <div className="flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+          <span className="text-slate-300 font-medium">
+            Verified Synthesis Generated by Agent Engine
+          </span>
+        </div>
+        <div className="flex items-center gap-3 font-mono text-[11px] text-slate-400">
+          <span className="flex items-center gap-1">
+            <Database className="w-3 h-3 text-emerald-400" />
+            <span>Storage: <strong className="text-slate-200 capitalize">{persistenceMode}</strong></span>
+          </span>
+          {backendStatus && (
+            <span className="flex items-center gap-1">
+              <Cpu className="w-3 h-3 text-cyan-400" />
+              <span>Model: <strong className="text-slate-200">{backendStatus.activeModel || 'Gemini'}</strong></span>
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* KPI Metrics Strip */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3.5 rounded-xl bg-[#090D16]/90 border border-white/[0.06] text-center font-mono text-xs shadow-inner">
+        <div>
+          <span className="text-[10px] text-slate-400 uppercase font-sans font-semibold">Sub-Questions Verified</span>
+          <p className="text-base font-bold text-cyan-400 mt-0.5">{metrics.subQuestionsVerified}</p>
+        </div>
+        <div>
+          <span className="text-[10px] text-slate-400 uppercase font-sans font-semibold">Sources Cross-Referenced</span>
+          <p className="text-base font-bold text-blue-400 mt-0.5">{metrics.sourcesAnalyzed}</p>
+        </div>
+        <div>
+          <span className="text-[10px] text-slate-400 uppercase font-sans font-semibold">Conflicts Reconciled</span>
+          <p className="text-base font-bold text-amber-400 mt-0.5">{metrics.conflictsReconciled}</p>
+        </div>
+        <div>
+          <span className="text-[10px] text-slate-400 uppercase font-sans font-semibold">Research Latency</span>
+          <p className="text-base font-bold text-emerald-400 mt-0.5">{metrics.latencySec}s</p>
+        </div>
+      </div>
+
+      {/* Section 1: Executive Summary */}
+      <div className="p-4 rounded-xl bg-[#090D16]/90 border border-white/[0.06] space-y-1.5 shadow-sm">
+        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-cyan-300">
+          <Lightbulb className="w-4 h-4 text-cyan-400" />
+          <span>1. Executive Summary</span>
+        </div>
+        <p className="text-xs text-slate-200 leading-relaxed font-sans pt-1">
+          {report.executiveSummary}
+        </p>
+      </div>
+
+      {/* Section 2: Key Findings (with Source Tags) */}
+      <div className="p-4 rounded-xl bg-[#090D16]/90 border border-white/[0.06] space-y-2.5 shadow-sm">
+        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-300">
+          <BookmarkCheck className="w-4 h-4 text-emerald-400" />
+          <span>2. Key Findings & Empirical Citations</span>
+        </div>
+
+        <div className="space-y-3 pt-1">
+          {report.keyFindings?.map((item, idx) => (
+            <div key={idx} className="p-3 rounded-lg bg-[#161F33]/80 border border-white/[0.06] text-xs space-y-1.5 shadow-sm">
+              <div className="flex items-start gap-2">
+                <span className="font-mono text-cyan-400 font-bold">{idx + 1}.</span>
+                <p className="text-slate-200 leading-relaxed flex-1">{item.finding}</p>
+              </div>
+
+              {/* Source tags */}
+              {item.sources && item.sources.length > 0 && (
+                <div className="flex flex-wrap items-center gap-1.5 pt-1 pl-4">
+                  <Tag className="w-3 h-3 text-slate-500" />
+                  <span className="text-[10px] text-slate-400 font-medium">Source Tags:</span>
+                  {item.sources.map((src, sIdx) => (
+                    <span
+                      key={sIdx}
+                      className="inline-flex items-center text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-950/70 text-cyan-300 border border-cyan-800/70"
+                    >
+                      {src}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Section 3: Open Questions / Unresolved Areas */}
+      <div className="p-4 rounded-xl bg-[#090D16]/90 border border-white/[0.06] space-y-2 shadow-sm">
+        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-violet-300">
+          <HelpCircle className="w-4 h-4 text-violet-400" />
+          <span>3. Open Questions & Areas for Further Investigation</span>
+        </div>
+
+        <ul className="space-y-1.5 pt-1 pl-1">
+          {report.openQuestions?.map((question, idx) => (
+            <li key={idx} className="text-xs text-slate-300 flex items-start gap-2 leading-relaxed">
+              <span className="text-violet-400 font-bold">•</span>
+              <span>{question}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* Reset / New Session */}
+      {onReset && (
+        <div className="flex justify-end pt-2">
+          <button
+            type="button"
+            onClick={onReset}
+            className="px-4 py-2 text-xs font-semibold rounded-xl bg-[#161F33] hover:bg-[#1E293B] text-slate-200 border border-white/[0.08] hover:border-cyan-500/40 transition-colors"
+          >
+            Start New Research Query
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
