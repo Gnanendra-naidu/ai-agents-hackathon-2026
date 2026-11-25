@@ -336,10 +336,16 @@ ${openQuestionsList.map((q) => `- ${q}`).join('\n')}
 
       {/* 3. Summary Section with Interactive Clickable Citations */}
       <div className="space-y-2.5">
-        <h3 className="text-xs font-bold uppercase tracking-wider text-cyan-400 flex items-center gap-2">
-          <Sparkles className="w-4 h-4" />
-          <span>Summary</span>
-        </h3>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-cyan-400 flex items-center gap-2">
+            <Sparkles className="w-4 h-4" />
+            <span>Summary</span>
+          </h3>
+          <span className="text-[10px] font-sans font-medium px-2 py-0.5 rounded-full bg-violet-950/60 text-violet-300 border border-violet-800/60 flex items-center gap-1">
+            <Sparkles className="w-3 h-3 text-violet-400" />
+            <span>Synthesized by Gemini from verified sources</span>
+          </span>
+        </div>
         <div className="p-4 sm:p-5 rounded-xl bg-[#090D16]/90 border border-white/[0.06] text-sm text-slate-200 leading-relaxed font-sans shadow-inner">
           {renderTextWithCitations(summaryText)}
         </div>
@@ -388,10 +394,16 @@ ${openQuestionsList.map((q) => `- ${q}`).join('\n')}
       {/* 5. Sources Used (with click-to-verify highlight) */}
       {sourcesList.length > 0 && (
         <div className="space-y-3">
-          <h3 className="text-xs font-bold uppercase tracking-wider text-cyan-400 flex items-center gap-2">
-            <Globe className="w-4 h-4" />
-            <span>Sources Used ({sourcesList.length})</span>
-          </h3>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-cyan-400 flex items-center gap-2">
+              <Globe className="w-4 h-4" />
+              <span>Sources Used ({sourcesList.length})</span>
+            </h3>
+            <span className="text-[10px] font-sans font-medium px-2 py-0.5 rounded-full bg-cyan-950/60 text-cyan-300 border border-cyan-800/60 flex items-center gap-1">
+              <Globe className="w-3 h-3 text-cyan-400" />
+              <span>Retrieved via deterministic API connectors</span>
+            </span>
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             {sourcesList.map((src, idx) => {
               const isUploaded = src.type === 'uploaded_doc' || src.url?.startsWith('local://');

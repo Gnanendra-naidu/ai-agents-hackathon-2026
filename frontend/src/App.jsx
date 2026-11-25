@@ -6,6 +6,7 @@ import ResearchProgressTracker from './components/ResearchProgressTracker';
 import AgentPlanCard from './components/AgentPlanCard';
 import ExecutionTimeline from './components/ExecutionTimeline';
 import HumanApprovalModal from './components/HumanApprovalModal';
+import ArchitectureModal, { SystemTransparencyCard } from './components/ArchitectureModal';
 import { BookOpen, AlertCircle, ChevronDown, ChevronUp, Terminal, Cpu, Database, Server } from 'lucide-react';
 import { checkBackendHealth, executeResearch, submitApprovalDecision, getApiBaseUrl } from './services/api';
 
@@ -26,6 +27,7 @@ export default function App() {
   const [isSubmittingApproval, setIsSubmittingApproval] = useState(false);
   const [networkError, setNetworkError] = useState(null);
   const [showTechnicalDetails, setShowTechnicalDetails] = useState(false);
+  const [isArchModalOpen, setIsArchModalOpen] = useState(false);
 
   // Backend Live Health State
   const [backendStatus, setBackendStatus] = useState({
@@ -311,6 +313,13 @@ export default function App() {
         agentStatus={agentStatus}
         backendStatus={backendStatus}
         onResetWorkspace={handleResetWorkspace}
+        onOpenArchitecture={() => setIsArchModalOpen(true)}
+      />
+
+      {/* Hybrid Architecture Transparency Modal */}
+      <ArchitectureModal
+        isOpen={isArchModalOpen}
+        onClose={() => setIsArchModalOpen(false)}
       />
 
       {/* Main Container */}
@@ -422,6 +431,9 @@ export default function App() {
                   </div>
                 </div>
 
+                {/* System Transparency: Custom Deterministic Code vs. AI Reasoning Breakdown */}
+                <SystemTransparencyCard />
+
                 {/* Sub-Question Decomposition Plan */}
                 <AgentPlanCard subQuestions={subQuestions} />
 
@@ -455,7 +467,13 @@ export default function App() {
           <span>• Research &amp; Knowledge Agent</span>
         </div>
         <div className="flex items-center gap-2 text-[11px] text-slate-500 mt-2 sm:mt-0 font-sans">
-          <span>Dual Real Tools (Wikipedia/Crossref &amp; Documents)</span>
+          <button
+            type="button"
+            onClick={() => setIsArchModalOpen(true)}
+            className="text-violet-400 hover:text-violet-300 underline font-medium cursor-pointer transition-colors"
+          >
+            Hybrid Architecture: Deterministic Retrieval + Gemini
+          </button>
           <span>•</span>
           <span>Human-in-the-Loop Safeguards</span>
         </div>

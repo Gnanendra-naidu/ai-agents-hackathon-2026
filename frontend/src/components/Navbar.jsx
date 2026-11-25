@@ -1,9 +1,10 @@
-import { Sparkles, RotateCcw } from 'lucide-react';
+import { Sparkles, RotateCcw, Cpu } from 'lucide-react';
 
 export default function Navbar({
   agentStatus = 'idle',
   backendStatus = { online: false },
   onResetWorkspace,
+  onOpenArchitecture,
 }) {
   const getStatusDisplay = () => {
     if (!backendStatus.online) {
@@ -38,10 +39,10 @@ export default function Navbar({
 
   return (
     <header className="sticky top-0 z-40 bg-[#090D16]/90 backdrop-blur-xl border-b border-white/[0.08] anim-slide-down">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
         {/* Brand & Plain-English Subtitle */}
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 via-teal-500 to-violet-600 flex items-center justify-center text-white shadow-lg shadow-cyan-500/20 ring-1 ring-white/20 transition-transform hover:scale-105 duration-200">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 via-teal-500 to-violet-600 flex items-center justify-center text-white shadow-lg shadow-cyan-500/20 ring-1 ring-white/20 transition-transform hover:scale-105 duration-200 flex-shrink-0">
             <Sparkles className="w-5 h-5 text-white" />
           </div>
           <div>
@@ -54,11 +55,23 @@ export default function Navbar({
           </div>
         </div>
 
-        {/* Right Status Pill & New Research Button */}
-        <div className="flex items-center gap-2.5">
+        {/* Center / Right Hybrid Architecture Badge & Actions */}
+        <div className="flex items-center gap-2 sm:gap-2.5">
+          {/* Clickable Hybrid Architecture Badge */}
+          <button
+            type="button"
+            onClick={onOpenArchitecture}
+            className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full bg-violet-950/40 hover:bg-violet-900/50 text-violet-300 border border-violet-700/50 hover:border-violet-500/70 transition-all active:scale-95 shadow-sm group"
+            title="Click to view Custom Code vs AI Breakdown"
+          >
+            <Cpu className="w-3.5 h-3.5 text-violet-400 group-hover:scale-110 transition-transform" />
+            <span className="hidden sm:inline">Hybrid System:</span>
+            <span>Deterministic Retrieval + Gemini</span>
+          </button>
+
           {/* Simple Clean Status Pill */}
           <div
-            className={`inline-flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-full border shadow-sm ${status.badge}`}
+            className={`hidden xs:inline-flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-full border shadow-sm ${status.badge}`}
           >
             <span className={`w-2 h-2 rounded-full ${status.dot}`} />
             <span>{status.label}</span>
@@ -68,11 +81,11 @@ export default function Navbar({
           <button
             type="button"
             onClick={onResetWorkspace}
-            className="inline-flex items-center gap-1.5 text-xs font-medium px-3.5 py-1.5 rounded-xl bg-[#161F33] hover:bg-[#1E293B] text-slate-200 hover:text-white border border-white/[0.08] hover:border-cyan-500/30 transition-all active:scale-95 shadow-sm"
+            className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-xl bg-[#161F33] hover:bg-[#1E293B] text-slate-200 hover:text-white border border-white/[0.08] hover:border-cyan-500/30 transition-all active:scale-95 shadow-sm"
             title="Start a fresh research topic"
           >
             <RotateCcw className="w-3.5 h-3.5 text-slate-400" />
-            <span className="hidden sm:inline">New Research</span>
+            <span className="hidden md:inline">New Research</span>
           </button>
         </div>
       </div>
