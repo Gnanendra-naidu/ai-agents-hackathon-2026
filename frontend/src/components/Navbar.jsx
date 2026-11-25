@@ -1,6 +1,5 @@
 import { Sparkles, RotateCcw, Cpu } from 'lucide-react';
 import { getProfessionById } from '../constants/professions';
-import ProfessionDropdown from './ProfessionDropdown';
 
 export default function Navbar({
   agentStatus = 'idle',
@@ -8,7 +7,6 @@ export default function Navbar({
   onResetWorkspace,
   onOpenArchitecture,
   selectedProfession = 'Students',
-  onProfessionChange,
 }) {
   const activeProf = getProfessionById(selectedProfession);
 
@@ -63,25 +61,18 @@ export default function Navbar({
           </div>
         </div>
 
-        {/* Dynamic Role Badge in Header */}
-        <div className="hidden lg:flex items-center gap-2">
+        {/* Dynamic Role Badge in Header (Clean indicator, no redundant dropdown) */}
+        <div className="flex items-center gap-2">
           <span
-            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border transition-all duration-300 shadow-sm ${activeProf.theme.badgeBg}`}
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all duration-300 shadow-sm ${activeProf.theme.badgeBg}`}
           >
             <span>{activeProf.icon}</span>
             <span>Mode: {activeProf.label}</span>
           </span>
         </div>
 
-        {/* Center / Right Custom Profession Dropdown & Actions */}
+        {/* Center / Right Header Badges & Actions */}
         <div className="flex items-center gap-2 sm:gap-2.5">
-          {/* Custom Sleek Profession Dropdown */}
-          <ProfessionDropdown
-            selectedProfession={selectedProfession}
-            onSelectProfession={onProfessionChange}
-            compact={true}
-          />
-
           {/* Clickable Hybrid Architecture Badge */}
           <button
             type="button"

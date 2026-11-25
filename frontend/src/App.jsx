@@ -315,14 +315,13 @@ export default function App() {
         <div className={`absolute bottom-1/3 left-1/3 w-[500px] h-[300px] ${activeProf.theme.glowBottom} rounded-full blur-[130px] transition-all duration-700`} />
       </div>
 
-      {/* 1. Top Header with Synchronized Dropdown & Theme Badges */}
+      {/* 1. Top Header with Active Role Badge */}
       <Navbar
         agentStatus={agentStatus}
         backendStatus={backendStatus}
         onResetWorkspace={handleResetWorkspace}
         onOpenArchitecture={() => setIsArchModalOpen(true)}
         selectedProfession={selectedProfession}
-        onProfessionChange={handleProfessionChange}
       />
 
       {/* Hybrid Architecture Transparency Modal */}
