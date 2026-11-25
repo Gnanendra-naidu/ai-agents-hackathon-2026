@@ -7,8 +7,8 @@
   
   body {
     font-family: var(--font-sans);
-    background-color: #090D16;
-    color: #e2e8f0;
+    background-color: #F8FAFC;
+    color: #1E293B;
     min-height: 100vh;
     overflow-x: hidden;
   }
@@ -39,10 +39,10 @@
 
 @keyframes pulseGlowCta {
   0%, 100% {
-    box-shadow: 0 0 16px -2px rgba(6, 182, 212, 0.4), 0 0 30px -4px rgba(16, 185, 129, 0.2);
+    box-shadow: 0 0 16px -2px rgba(16, 185, 129, 0.25), 0 0 30px -4px rgba(6, 182, 212, 0.15);
   }
   50% {
-    box-shadow: 0 0 26px 2px rgba(6, 182, 212, 0.65), 0 0 45px 0 rgba(16, 185, 129, 0.35);
+    box-shadow: 0 0 24px 2px rgba(16, 185, 129, 0.4), 0 0 40px 0 rgba(6, 182, 212, 0.25);
   }
 }
 
@@ -93,33 +93,9 @@
   animation: subtleRadarPulse 2s infinite ease-in-out;
 }
 
-/* Glassmorphic Obsidian Card Effect */
+/* Crisp Clean Light Card Effect */
 .glass-obsidian {
-  background: rgba(17, 24, 39, 0.75);
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-}
-
-.glass-obsidian:hover {
-  border-color: rgba(6, 182, 212, 0.25);
-}
-
-/* Custom scrollbars for SaaS dashboards */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: #090D16;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #1e293b;
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #334155;
 }

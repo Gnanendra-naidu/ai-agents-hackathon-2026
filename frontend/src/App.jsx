@@ -17,7 +17,7 @@ export default function App() {
 
   const [researchQuestion, setResearchQuestion] = useState(activeProf.defaultQuestion);
   const [sourceTypes, setSourceTypes] = useState({ webSearch: true, knowledgeBase: true });
-  const [agentStatus, setAgentStatus] = useState('idle'); // 'idle' | 'searching' | 'awaiting_approval' | 'completed' | 'conflict_detected' | 'error'
+  const [agentStatus, setAgentStatus] = useState('idle');
   const [subQuestions, setSubQuestions] = useState([]);
   const [traces, setTraces] = useState([]);
   const [conflictFlag, setConflictFlag] = useState(null);
@@ -197,7 +197,7 @@ export default function App() {
     }
   };
 
-  // Human Approval Gate Handler: Calls POST /api/research/:sessionId/approval
+  // Human Approval Gate Handler
   const handleApproveAction = async () => {
     if (!sessionId) {
       setPendingApproval(null);
@@ -307,11 +307,11 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#090D16] text-slate-100 flex flex-col font-sans selection:bg-cyan-500/30 relative overflow-x-hidden transition-colors duration-300">
-      {/* Dynamic Ambient Radial Gradient Glows matching Active Profession Theme */}
+    <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col font-sans selection:bg-cyan-500/20 relative overflow-x-hidden transition-colors duration-300">
+      {/* Ambient Gradient Glows */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0 transition-all duration-700">
         <div className={`absolute top-0 left-1/4 -translate-x-1/2 w-[650px] h-[380px] ${activeProf.theme.glowTop} rounded-full blur-[140px] transition-all duration-700`} />
-        <div className="absolute top-1/4 right-1/4 translate-x-1/2 w-[550px] h-[350px] bg-violet-600/[0.06] rounded-full blur-[140px]" />
+        <div className="absolute top-1/4 right-1/4 translate-x-1/2 w-[550px] h-[350px] bg-violet-400/[0.05] rounded-full blur-[140px]" />
         <div className={`absolute bottom-1/3 left-1/3 w-[500px] h-[300px] ${activeProf.theme.glowBottom} rounded-full blur-[130px] transition-all duration-700`} />
       </div>
 
@@ -334,22 +334,22 @@ export default function App() {
       <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 relative z-10">
         {/* Network / Connection Error Banner */}
         {networkError && (
-          <div className="p-4 rounded-xl bg-rose-950/70 border border-rose-700 text-rose-200 text-xs sm:text-sm flex items-center justify-between gap-3 shadow-lg animate-in fade-in">
+          <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs sm:text-sm flex items-center justify-between gap-3 shadow-sm animate-in fade-in">
             <div className="flex items-center gap-2.5">
-              <AlertCircle className="w-5 h-5 text-rose-400 flex-shrink-0" />
+              <AlertCircle className="w-5 h-5 text-rose-600 flex-shrink-0" />
               <span>{networkError}</span>
             </div>
             <button
               type="button"
               onClick={() => handleLaunchResearch()}
-              className="px-3.5 py-1.5 rounded-lg bg-rose-900 hover:bg-rose-800 text-white font-medium text-xs transition-colors flex-shrink-0"
+              className="px-3.5 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-medium text-xs transition-colors flex-shrink-0 cursor-pointer"
             >
               Retry
             </button>
           </div>
         )}
 
-        {/* 2. Main Guided Input Area with Dynamic Profession Dropdown & Themes */}
+        {/* 2. Main Guided Input Area with Custom Profession Dropdown */}
         <GoalInputPanel
           researchQuestion={researchQuestion}
           onQuestionChange={setResearchQuestion}
@@ -363,7 +363,7 @@ export default function App() {
           hasActiveSession={Boolean(sessionId || finalReport)}
         />
 
-        {/* 3. Simple Progress Tracker while Researching */}
+        {/* 3. Progress Tracker while Researching */}
         {isSearching && (
           <ResearchProgressTracker
             tracesCount={traces.length}
@@ -371,7 +371,7 @@ export default function App() {
           />
         )}
 
-        {/* 4. Human Approval Gate (Pauses execution when action requires signoff) */}
+        {/* 4. Human Approval Gate */}
         {pendingApproval && (
           <HumanApprovalModal
             approvalRequest={pendingApproval}
@@ -383,23 +383,23 @@ export default function App() {
 
         {/* Dynamic Active Role Banner before Report */}
         {finalReport && (
-          <div className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-[#111827]/70 border border-white/[0.08] backdrop-blur-md transition-all duration-300">
+          <div className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-white border border-slate-200 shadow-xs transition-all duration-300">
             <div className="flex items-center gap-2">
               <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${activeProf.theme.badgeBg}`}>
                 <span>{activeProf.icon}</span>
                 <span>Active Role: {activeProf.label}</span>
               </span>
-              <span className="text-xs text-slate-400 hidden sm:inline">
+              <span className="text-xs text-slate-500 hidden sm:inline">
                 Tailored for {activeProf.description}
               </span>
             </div>
-            <span className="text-xs font-mono text-slate-400">
+            <span className="text-xs font-mono text-slate-500">
               Verified with 100% Citation Grounding
             </span>
           </div>
         )}
 
-        {/* 5. Clean Final Report View */}
+        {/* 5. Final Report View */}
         {finalReport && (
           <FinalResultPanel
             report={finalReport}
@@ -411,27 +411,27 @@ export default function App() {
           />
         )}
 
-        {/* 6. Collapsed Technical Details Accordion (For Judges & Proof) */}
+        {/* 6. Collapsed Technical Details Accordion */}
         {(traces.length > 0 || subQuestions.length > 0) && (
           <div className="pt-2">
             <button
               type="button"
               onClick={() => setShowTechnicalDetails((v) => !v)}
-              className="w-full flex items-center justify-between p-3.5 rounded-xl bg-[#111827]/60 hover:bg-[#111827] border border-white/[0.06] hover:border-white/[0.12] text-xs text-slate-400 hover:text-slate-200 transition-all shadow-sm"
+              className="w-full flex items-center justify-between p-3.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-xs text-slate-600 hover:text-slate-900 transition-all shadow-xs cursor-pointer"
             >
               <div className="flex items-center gap-2">
                 <Terminal className={`w-4 h-4 ${activeProf.theme.textAccent} transition-colors duration-300`} />
-                <span className="font-semibold text-slate-300">
+                <span className="font-semibold text-slate-800">
                   {showTechnicalDetails ? 'Hide Raw Agent Execution Trace' : 'View Raw Agent Execution Trace'}
                 </span>
-                <span className="text-[11px] font-mono px-2 py-0.5 rounded-md bg-[#090D16] text-slate-400 border border-white/[0.06]">
+                <span className="text-[11px] font-mono px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 border border-slate-200">
                   {traces.length} events • {subQuestions.length} sub-questions
                 </span>
               </div>
               {showTechnicalDetails ? (
-                <ChevronUp className="w-4 h-4 text-slate-400" />
+                <ChevronUp className="w-4 h-4 text-slate-500" />
               ) : (
-                <ChevronDown className="w-4 h-4 text-slate-400" />
+                <ChevronDown className="w-4 h-4 text-slate-500" />
               )}
             </button>
 
@@ -439,20 +439,20 @@ export default function App() {
             {showTechnicalDetails && (
               <div className="mt-4 space-y-5 animate-in fade-in duration-200">
                 {/* Technical Environment & Session Card */}
-                <div className="p-3.5 rounded-xl bg-[#090D16]/80 border border-white/[0.06] flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-slate-400">
+                <div className="p-3.5 rounded-xl bg-white border border-slate-200 flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-slate-600 shadow-2xs">
                   <div className="flex items-center gap-2">
                     <Server className={`w-3.5 h-3.5 ${activeProf.theme.textAccent} transition-colors duration-300`} />
-                    <span>Backend: <code className="text-cyan-300">{getApiBaseUrl()}</code></span>
-                    {sessionId && <span className="text-slate-500">• ID: {sessionId}</span>}
+                    <span>Backend: <code className="text-cyan-700 font-bold">{getApiBaseUrl()}</code></span>
+                    {sessionId && <span className="text-slate-400">• ID: {sessionId}</span>}
                   </div>
                   <div className="flex items-center gap-3">
                     <span className="flex items-center gap-1.5">
-                      <Database className="w-3.5 h-3.5 text-emerald-400" />
-                      <span>Persistence: <strong className="text-slate-200 capitalize">{backendStatus.persistenceMode}</strong></span>
+                      <Database className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>Persistence: <strong className="text-slate-800 capitalize">{backendStatus.persistenceMode}</strong></span>
                     </span>
                     <span className="flex items-center gap-1.5">
-                      <Cpu className="w-3.5 h-3.5 text-violet-400" />
-                      <span>Model: <strong className="text-slate-200">{backendStatus.activeModel}</strong></span>
+                      <Cpu className="w-3.5 h-3.5 text-violet-600" />
+                      <span>Model: <strong className="text-slate-800">{backendStatus.activeModel}</strong></span>
                     </span>
                   </div>
                 </div>
@@ -472,12 +472,12 @@ export default function App() {
                 />
 
                 {/* Technical Execution Metrics */}
-                <div className="p-3.5 rounded-xl bg-[#090D16]/70 border border-white/[0.06] flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-slate-400">
-                  <span>Sub-Questions Verified: <strong className="text-slate-200">{metrics.subQuestionsVerified}</strong></span>
-                  <span>Sources Analyzed: <strong className="text-slate-200">{metrics.sourcesAnalyzed}</strong></span>
-                  <span>Conflicts Reconciled: <strong className="text-slate-200">{metrics.conflictsReconciled}</strong></span>
-                  <span>Estimated Tokens: <strong className="text-slate-200">{metrics.estimatedTokens}</strong></span>
-                  <span>Execution Latency: <strong className="text-slate-200">{metrics.latencySec}s</strong></span>
+                <div className="p-3.5 rounded-xl bg-white border border-slate-200 flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-slate-600 shadow-2xs">
+                  <span>Sub-Questions Verified: <strong className="text-slate-900">{metrics.subQuestionsVerified}</strong></span>
+                  <span>Sources Analyzed: <strong className="text-slate-900">{metrics.sourcesAnalyzed}</strong></span>
+                  <span>Conflicts Reconciled: <strong className="text-slate-900">{metrics.conflictsReconciled}</strong></span>
+                  <span>Estimated Tokens: <strong className="text-slate-900">{metrics.estimatedTokens}</strong></span>
+                  <span>Execution Latency: <strong className="text-slate-900">{metrics.latencySec}s</strong></span>
                 </div>
               </div>
             )}
@@ -485,11 +485,11 @@ export default function App() {
         )}
       </main>
 
-      {/* Simplified Clean Footer */}
-      <footer className="border-t border-white/[0.08] bg-[#090D16] py-6 px-4 text-center text-xs text-slate-500 relative z-10 flex flex-col sm:flex-row items-center justify-between max-w-5xl mx-auto w-full transition-colors duration-300">
+      {/* Clean Footer */}
+      <footer className="border-t border-slate-200 bg-white py-6 px-4 text-center text-xs text-slate-500 relative z-10 flex flex-col sm:flex-row items-center justify-between max-w-5xl mx-auto w-full transition-colors duration-300">
         <div className="flex items-center gap-2">
           <BookOpen className={`w-4 h-4 ${activeProf.theme.textAccent} transition-colors duration-300`} />
-          <span className="font-semibold text-slate-300">Agentic Mode-AI</span>
+          <span className="font-semibold text-slate-800">Agentic Mode-AI</span>
           <span>• Research &amp; Knowledge Agent</span>
           <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${activeProf.theme.badgeBg}`}>
             {activeProf.icon} {activeProf.label} Mode
@@ -499,7 +499,7 @@ export default function App() {
           <button
             type="button"
             onClick={() => setIsArchModalOpen(true)}
-            className="text-violet-400 hover:text-violet-300 underline font-medium cursor-pointer transition-colors"
+            className="text-violet-600 hover:text-violet-700 underline font-medium cursor-pointer transition-colors"
           >
             Hybrid Architecture: Deterministic Retrieval + Gemini
           </button>
