@@ -1,4 +1,4 @@
-import { Sparkles, RotateCcw, Cpu } from 'lucide-react';
+import { Sparkles, RotateCcw, Cpu, PlayCircle } from 'lucide-react';
 import { getProfessionById } from '../constants/professions';
 
 export default function Navbar({
@@ -7,6 +7,7 @@ export default function Navbar({
   onResetWorkspace,
   onOpenArchitecture,
   selectedProfession = 'Students',
+  onOpenDemo,
 }) {
   const activeProf = getProfessionById(selectedProfession);
 
@@ -73,16 +74,27 @@ export default function Navbar({
 
         {/* Center / Right Header Badges & Actions */}
         <div className="flex items-center gap-2 sm:gap-2.5">
+          {/* Quick Demo Button to replay Welcome Intro */}
+          <button
+            type="button"
+            onClick={onOpenDemo}
+            className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border border-slate-200 transition-all active:scale-95 shadow-2xs cursor-pointer"
+            title="Watch 12-second animated product preview"
+          >
+            <PlayCircle className="w-3.5 h-3.5 text-cyan-600" />
+            <span className="hidden sm:inline">Watch Quick Demo</span>
+            <span className="sm:hidden">Demo</span>
+          </button>
+
           {/* Clickable Hybrid Architecture Badge */}
           <button
             type="button"
             onClick={onOpenArchitecture}
-            className="hidden sm:inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full bg-violet-50 hover:bg-violet-100 text-violet-700 border border-violet-200 hover:border-violet-300 transition-all active:scale-95 shadow-xs group cursor-pointer"
+            className="hidden md:inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full bg-violet-50 hover:bg-violet-100 text-violet-700 border border-violet-200 hover:border-violet-300 transition-all active:scale-95 shadow-xs group cursor-pointer"
             title="Click to view Custom Code vs AI Breakdown"
           >
             <Cpu className="w-3.5 h-3.5 text-violet-600 group-hover:scale-110 transition-transform" />
-            <span className="hidden md:inline">Hybrid System:</span>
-            <span>Deterministic + Gemini</span>
+            <span>Hybrid Architecture</span>
           </button>
 
           {/* Simple Clean Status Pill */}

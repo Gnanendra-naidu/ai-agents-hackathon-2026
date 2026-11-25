@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
+import WelcomeIntro from './components/WelcomeIntro';
 import GoalInputPanel from './components/GoalInputPanel';
 import FinalResultPanel from './components/FinalResultPanel';
 import ResearchProgressTracker from './components/ResearchProgressTracker';
@@ -29,6 +30,18 @@ export default function App() {
   const [networkError, setNetworkError] = useState(null);
   const [showTechnicalDetails, setShowTechnicalDetails] = useState(false);
   const [isArchModalOpen, setIsArchModalOpen] = useState(false);
+  const [showWelcomeIntro, setShowWelcomeIntro] = useState(() => {
+    return sessionStorage.getItem('agentic_welcome_dismissed') !== 'true';
+  });
+
+  const handleDismissIntro = () => {
+    setShowWelcomeIntro(false);
+    sessionStorage.setItem('agentic_welcome_dismissed', 'true');
+  };
+
+  const handleOpenIntro = () => {
+    setShowWelcomeIntro(true);
+  };
 
   // Backend Live Health State
   const [backendStatus, setBackendStatus] = useState({
@@ -322,6 +335,7 @@ export default function App() {
         onResetWorkspace={handleResetWorkspace}
         onOpenArchitecture={() => setIsArchModalOpen(true)}
         selectedProfession={selectedProfession}
+        onOpenDemo={handleOpenIntro}
       />
 
       {/* Hybrid Architecture Transparency Modal */}
@@ -332,6 +346,19 @@ export default function App() {
 
       {/* Main Container */}
       <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 relative z-10">
+        {/* Welcome Intro Walkthrough Banner / Animated Product Preview */}
+        {showWelcomeIntro && (
+          <WelcomeIntro
+            isOpen={showWelcomeIntro}
+            onClose={handleDismissIntro}
+            selectedProfession={selectedProfession}
+            onStartResearch={() => {
+              handleDismissIntro();
+              const el = document.getElementById('research-question');
+              if (el) el.focus();
+            }}
+          />
+        )}
         {/* Network / Connection Error Banner */}
         {networkError && (
           <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs sm:text-sm flex items-center justify-between gap-3 shadow-sm animate-in fade-in">
