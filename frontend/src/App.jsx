@@ -6,188 +6,15 @@ import ExecutionTimeline from './components/ExecutionTimeline';
 import HumanApprovalModal from './components/HumanApprovalModal';
 import FinalResultPanel from './components/FinalResultPanel';
 import { BookOpen, Server, RefreshCw, Cpu, Database, AlertCircle } from 'lucide-react';
-import { checkBackendHealth, executeResearch, submitApprovalDecision } from './services/api';
+import { checkBackendHealth, executeResearch, submitApprovalDecision, getApiBaseUrl } from './services/api';
 
-// Demo Scenarios for Offline Verification & Fallback
-const SCENARIO_SYNTHESIS = {
-  question: 'What are the verified economic trade-offs, hallucination rates, and human-in-the-loop bottlenecks of multi-agent AI frameworks in production?',
-  audience: 'Researchers',
-  subQuestions: [
-    { id: 'sq-1', title: 'Empirical context exhaustion boundaries in long-running agent tool loops', status: 'verified' },
-    { id: 'sq-2', title: 'Inference latency and token cost multipliers of collaborative agent swarms', status: 'verified' },
-    { id: 'sq-3', title: 'Verified mitigation techniques for tool parameter hallucination and schema drifts', status: 'verified' },
-    { id: 'sq-4', title: 'Quantitative impact of human-in-the-loop checkpoints on task completion throughput', status: 'verified' },
-  ],
-  traces: [
-    {
-      id: 't-1',
-      type: 'thought',
-      content: 'Primary question decomposed into 4 investigative sub-questions across context limits, cost trade-offs, and guardrail overhead.',
-      timestamp: '11:14:02',
-    },
-    {
-      id: 't-2',
-      type: 'tool_call',
-      toolName: 'search_web_knowledge',
-      sourceType: 'Academic Web (ArXiv)',
-      params: { query: 'agentic reasoning context drift tool calling', max_results: 3 },
-      timestamp: '11:14:05',
-    },
-    {
-      id: 't-3',
-      type: 'observation',
-      source: 'Wikipedia & Crossref Academic Index',
-      latencyMs: 140,
-      summary: 'Retrieved peer-reviewed literature analyzing recursive self-correction and schema validation in agent tool chains.',
-      citations: [
-        { id: '1', label: 'Yao et al., ReAct: Synergizing Reasoning and Acting in Language Models', year: '2023' },
-        { id: '2', label: 'Shinn et al., Reflexion: Language Agents with Verbal Reinforcement Learning', year: '2023' },
-      ],
-      timestamp: '11:14:07',
-    },
-    {
-      id: 't-4',
-      type: 'thought',
-      content: 'Querying enterprise knowledge base for empirical token consumption benchmarks and approval latency.',
-      timestamp: '11:14:09',
-    },
-    {
-      id: 't-5',
-      type: 'tool_call',
-      toolName: 'query_knowledge_base',
-      sourceType: 'Vector Knowledge Store & Corpus',
-      params: { query: 'agent economics token multiplication latency hitl', maxResults: 2 },
-      timestamp: '11:14:11',
-    },
-    {
-      id: 't-6',
-      type: 'observation',
-      source: 'Enterprise Knowledge Base',
-      latencyMs: 82,
-      summary: 'Internal telemetry indicates human approval gates eliminate 98% of destructive action regressions with 4.2-min queue delay.',
-      citations: [
-        { id: '3', label: 'Enterprise Agentic Safety Survey 2024', year: '2024' },
-      ],
-      timestamp: '11:14:13',
-    },
-  ],
-  report: {
-    title: 'Multi-Agent Production Viability & Guardrail Impact Assessment',
-    audience: 'Researchers',
-    executiveSummary: 'This research synthesis examines empirical trade-offs in deploying multi-agent autonomous systems. While agent decomposition improves modular problem solving, multi-agent token overhead amplifies operational costs by 2.4x–3.8x compared to single-agent prompts. Human-in-the-loop (HITL) approval gates represent the most reliable safeguard against catastrophic tool mutations, providing a 98% reduction in irreversible errors at the expense of automated throughput.',
-    keyFindings: [
-      {
-        finding: 'Recursive tool loops without schema validation experience an average 18.4% parameter distortion after 6 continuous tool iterations.',
-        sources: ['ArXiv:2303.11366 (ReAct)', 'Enterprise Safety Telemetry'],
-      },
-      {
-        finding: 'Multi-agent consensus communication increases token consumption by approximately 3.1x, requiring selective supervisor routing rather than broadcast gossip protocols.',
-        sources: ['Reflexion Survey 2023', 'Stanford HAI Benchmark'],
-      },
-      {
-        finding: 'Human approval mechanisms for destructive actions eliminate irreversible database mutations with a manageable operational queue latency of 4.2 minutes.',
-        sources: ['Production Agent Benchmarks 2024'],
-      },
-    ],
-    openQuestions: [
-      'What are optimal automated pruning algorithms to prevent context degradation in 50+ step agent trajectories?',
-      'How do asynchronous human approval queues affect session timeout policies in user-facing SaaS interfaces?',
-    ],
-  },
-  metrics: {
-    subQuestionsVerified: 4,
-    sourcesAnalyzed: 9,
-    conflictsReconciled: 0,
-    estimatedTokens: 2450,
-    latencySec: '7.8',
-  },
-};
-
-const SCENARIO_CONFLICT = {
-  question: 'Compare inference cost efficiency: Single Prompt Large Model vs Collaborative Multi-Agent Swarm architectures.',
-  audience: 'Founders',
-  subQuestions: [
-    { id: 'sq-1', title: 'Raw token consumption divergence across single vs multi-agent execution', status: 'verified' },
-    { id: 'sq-2', title: 'Task accuracy gains vs computational overhead ratio', status: 'conflict_flagged' },
-    { id: 'sq-3', title: 'Production infrastructure cost modeling and ROI metrics', status: 'verified' },
-  ],
-  traces: [
-    {
-      id: 't-1',
-      type: 'thought',
-      content: 'Investigating cost/accuracy trade-offs between monolithic prompt engineering versus multi-agent agentic swarms.',
-      timestamp: '11:14:20',
-    },
-    {
-      id: 't-2',
-      type: 'tool_call',
-      toolName: 'search_web_knowledge',
-      sourceType: 'Academic Web',
-      params: { query: 'multi-agent swarm cost efficiency benchmark accuracy' },
-      timestamp: '11:14:22',
-    },
-    {
-      id: 't-3',
-      type: 'observation',
-      source: 'Academic Benchmark Index',
-      latencyMs: 110,
-      summary: 'Retrieved dual independent benchmarks reporting conflicting conclusions on swarm ROI.',
-      citations: [
-        { id: '1', label: 'MIT CSAIL Agent Benchmark Paper', year: '2024' },
-        { id: '2', label: 'Enterprise AI Infrastructure Report', year: '2024' },
-      ],
-      timestamp: '11:14:24',
-    },
-  ],
-  conflict: {
-    description: 'Empirical datasets diverge significantly regarding whether multi-agent swarms deliver positive ROI in general enterprise tasks.',
-    sourceA: {
-      name: 'MIT CSAIL Benchmark (2024)',
-      claim: 'Multi-agent swarms reduce error rates by 38% on complex code synthesis, fully justifying the 2.1x token multiplication.',
-    },
-    sourceB: {
-      name: 'Enterprise AI Survey (2024)',
-      claim: 'Over 62% of multi-agent swarm deployments exceed compute budgets without measurable accuracy advantages over structured single prompts.',
-    },
-    resolutionStrategy: 'Classifying discrepancy by task complexity: swarms provide positive ROI strictly on multi-stage logical decomposition tasks, whereas single prompts remain optimal for direct summarization.',
-  },
-  report: {
-    title: 'Single-Agent vs Multi-Agent Swarm Economic Feasibility Analysis',
-    audience: 'Founders',
-    executiveSummary: 'This analysis reconciles conflicting industry and academic claims on multi-agent economics. Our investigation reveals that swarm architectures are economically unjustified for linear, single-step tasks due to token bloat. However, for complex workflows with branching logic and verification needs, agent decomposition pays for itself by reducing costly downstream failure recovery.',
-    keyFindings: [
-      {
-        finding: 'Academic evaluations focus on complex reasoning benchmarks where swarms achieve 38% accuracy improvements.',
-        sources: ['MIT CSAIL Benchmark 2024'],
-      },
-      {
-        finding: 'Enterprise evaluations focus on routine retrieval where agent chatter inflates API bills without accuracy lift.',
-        sources: ['Enterprise AI Survey 2024'],
-      },
-      {
-        finding: 'Hybrid routing reduces median cost by 54%.',
-        sources: ['Internal Synthesis Guidelines'],
-      },
-    ],
-    openQuestions: [
-      'What threshold of task branching complexity mathematically justifies spawning a second subagent?',
-    ],
-  },
-  metrics: {
-    subQuestionsVerified: 3,
-    sourcesAnalyzed: 6,
-    conflictsReconciled: 1,
-    estimatedTokens: 1980,
-    latencySec: '6.4',
-  },
-};
+const DEFAULT_QUESTION = 'What are the verified economic trade-offs, hallucination rates, and human-in-the-loop bottlenecks of multi-agent AI frameworks in production?';
 
 export default function App() {
-  const [researchQuestion, setResearchQuestion] = useState(SCENARIO_SYNTHESIS.question);
+  const [researchQuestion, setResearchQuestion] = useState(DEFAULT_QUESTION);
   const [targetAudience, setTargetAudience] = useState('Researchers');
   const [sourceTypes, setSourceTypes] = useState({ webSearch: true, knowledgeBase: true });
-  const [scenario, setScenario] = useState('live'); // 'live' | 'normal' | 'conflict' | 'approval' | 'error'
-  const [agentStatus, setAgentStatus] = useState('idle');
+  const [agentStatus, setAgentStatus] = useState('idle'); // 'idle' | 'searching' | 'awaiting_approval' | 'completed' | 'conflict_detected' | 'error'
   const [subQuestions, setSubQuestions] = useState([]);
   const [traces, setTraces] = useState([]);
   const [conflictFlag, setConflictFlag] = useState(null);
@@ -204,6 +31,7 @@ export default function App() {
     persistenceMode: 'memory',
     geminiConfigured: false,
     activeModel: 'gemini-3.8-flash',
+    fallbackModel: 'gemini-3.5-flash-lite',
   });
 
   const [metrics, setMetrics] = useState({
@@ -214,7 +42,7 @@ export default function App() {
     latencySec: '0.0',
   });
 
-  // Check backend health on mount and provide refresh
+  // Check backend health on mount and periodically
   const handleRefreshHealth = async () => {
     const health = await checkBackendHealth();
     setBackendStatus(health);
@@ -240,48 +68,19 @@ export default function App() {
     setSourceTypes((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
-  // Main Research Launch Handler (Real Backend API Call + Demo Fallback)
+  // Main Research Launch Handler (Real Backend API Call)
   const handleLaunchResearch = async ({ uploadedNotes } = {}) => {
+    if (!researchQuestion.trim()) return;
+
     setNetworkError(null);
     setFinalReport(null);
     setConflictFlag(null);
     setPendingApproval(null);
-
-    // If Demo Scenario selected, run local scenario preview
-    if (scenario === 'normal') {
-      setResearchQuestion(SCENARIO_SYNTHESIS.question);
-      setTargetAudience(SCENARIO_SYNTHESIS.audience);
-      setAgentStatus('searching');
-      setSubQuestions(SCENARIO_SYNTHESIS.subQuestions.map((q, idx) => ({ ...q, status: idx === 0 ? 'searching' : 'pending' })));
-      setTraces([SCENARIO_SYNTHESIS.traces[0]]);
-
-      setTimeout(() => {
-        setSubQuestions(SCENARIO_SYNTHESIS.subQuestions);
-        setTraces(SCENARIO_SYNTHESIS.traces);
-        setFinalReport(SCENARIO_SYNTHESIS.report);
-        setMetrics(SCENARIO_SYNTHESIS.metrics);
-        setAgentStatus('completed');
-      }, 700);
-      return;
-    }
-
-    if (scenario === 'conflict') {
-      setResearchQuestion(SCENARIO_CONFLICT.question);
-      setTargetAudience(SCENARIO_CONFLICT.audience);
-      setAgentStatus('conflict_detected');
-      setSubQuestions(SCENARIO_CONFLICT.subQuestions);
-      setTraces(SCENARIO_CONFLICT.traces);
-      setConflictFlag(SCENARIO_CONFLICT.conflict);
-      setFinalReport(SCENARIO_CONFLICT.report);
-      setMetrics(SCENARIO_CONFLICT.metrics);
-      return;
-    }
-
-    // Live execution mode: Call POST /api/research
     setIsSearching(true);
     setAgentStatus('searching');
+
     setSubQuestions([
-      { id: 'sq-init-1', title: `Decomposing core dimensions for: "${researchQuestion.slice(0, 45)}..."`, status: 'searching' },
+      { id: 'sq-init-1', title: `Decomposing primary dimensions for: "${researchQuestion.slice(0, 45)}..."`, status: 'searching' },
       { id: 'sq-init-2', title: 'Connecting to live web search & knowledge base tools', status: 'pending' },
     ]);
 
@@ -289,7 +88,7 @@ export default function App() {
       {
         id: `t-init-${Date.now()}`,
         type: 'thought',
-        content: `Dispatching research query to backend engine at ${import.meta.env.VITE_API_URL || 'http://localhost:5000'}. Executing sub-question planner.`,
+        content: `Dispatching research query to Express backend at ${getApiBaseUrl()}. Invoking Gemini sub-question planner and tool calling engine.`,
         timestamp: new Date().toLocaleTimeString(),
       },
     ]);
@@ -299,8 +98,8 @@ export default function App() {
         question: researchQuestion,
         audience: targetAudience,
         enabledSources: sourceTypes,
-        uploadedNotes: uploadedNotes || null,
-        sessionId: null,
+        uploadedNotes: uploadedNotes || undefined,
+        sessionId: undefined,
       });
 
       setSessionId(data.sessionId);
@@ -308,7 +107,11 @@ export default function App() {
       setTraces(data.traces || []);
       setConflictFlag(data.conflictFlag || null);
       setPendingApproval(data.pendingApproval || null);
-      setFinalReport(data.report || null);
+
+      if (data.report) {
+        setFinalReport(data.report);
+      }
+
       setMetrics(data.metrics || {
         subQuestionsVerified: (data.subQuestions || []).filter((q) => q.status === 'verified').length,
         sourcesAnalyzed: (data.traces || []).filter((t) => t.citations && t.citations.length > 0).length,
@@ -317,12 +120,18 @@ export default function App() {
         latencySec: data.metrics?.latencySec || '4.5',
       });
 
-      setAgentStatus(data.conflictFlag ? 'conflict_detected' : 'completed');
+      if (data.pendingApproval) {
+        setAgentStatus('awaiting_approval');
+      } else if (data.conflictFlag) {
+        setAgentStatus('conflict_detected');
+      } else {
+        setAgentStatus('completed');
+      }
+
       handleRefreshHealth();
     } catch (err) {
       setNetworkError(err.message || 'Failed to reach research backend API.');
       setAgentStatus('error');
-      // If backend is not running, provide one-click offline preview recovery
       setSubQuestions((prev) => prev.map((q) => ({ ...q, status: 'failed' })));
     } finally {
       setIsSearching(false);
@@ -332,6 +141,8 @@ export default function App() {
   // Follow-up question submission
   const handleAskFollowUp = async (query) => {
     if (!query.trim()) return;
+
+    setNetworkError(null);
     setIsSearching(true);
     setAgentStatus('searching');
 
@@ -340,7 +151,7 @@ export default function App() {
       {
         id: `t-followup-${Date.now()}`,
         type: 'thought',
-        content: `Follow-up inquiry submitted: "${query}". Calling backend with active session context.`,
+        content: `Follow-up inquiry submitted: "${query}". Calling backend with active session ${sessionId || 'new'}.`,
         timestamp: new Date().toLocaleTimeString(),
       },
     ]);
@@ -350,37 +161,26 @@ export default function App() {
         question: researchQuestion,
         audience: targetAudience,
         enabledSources: sourceTypes,
-        sessionId: sessionId || null,
+        sessionId: sessionId || undefined,
         followUpQuestion: query,
       });
 
       setSessionId(data.sessionId);
-      setSubQuestions(data.subQuestions || []);
-      setTraces(data.traces || []);
+      if (data.subQuestions) setSubQuestions(data.subQuestions);
+      if (data.traces) setTraces(data.traces);
+      if (data.conflictFlag) setConflictFlag(data.conflictFlag);
+      if (data.pendingApproval) setPendingApproval(data.pendingApproval);
       if (data.report) setFinalReport(data.report);
       if (data.metrics) setMetrics(data.metrics);
-      setAgentStatus('completed');
-    } catch {
-      // Local graceful fallback if backend is offline
-      const newSubQuestion = {
-        id: `sq-followup-${Date.now()}`,
-        title: `Follow-up: ${query}`,
-        status: 'verified',
-      };
-      setSubQuestions((prev) => [...prev, newSubQuestion]);
-      setTraces((prev) => [
-        ...prev,
-        {
-          id: `t-obs-followup-${Date.now()}`,
-          type: 'observation',
-          source: 'Knowledge Base Expansion',
-          latencyMs: 84,
-          summary: `Extracted focused evidence addressing "${query}". Added to synthesis.`,
-          citations: [{ id: 'F1', label: 'Dynamic Knowledge Synthesis Telemetry', year: '2024' }],
-          timestamp: new Date().toLocaleTimeString(),
-        },
-      ]);
-      setAgentStatus('completed');
+
+      if (data.pendingApproval) {
+        setAgentStatus('awaiting_approval');
+      } else {
+        setAgentStatus('completed');
+      }
+    } catch (err) {
+      setNetworkError(`Follow-up inquiry failed: ${err.message}`);
+      setAgentStatus('error');
     } finally {
       setIsSearching(false);
     }
@@ -388,15 +188,20 @@ export default function App() {
 
   // Real Human Approval Gate Handler: Calls POST /api/research/:sessionId/approval
   const handleApproveAction = async () => {
+    if (!sessionId) {
+      setPendingApproval(null);
+      setAgentStatus('completed');
+      return;
+    }
+
     setIsSubmittingApproval(true);
     try {
-      if (sessionId) {
-        await submitApprovalDecision(sessionId, {
-          decision: 'approve',
-          actionName: pendingApproval?.actionName || 'export_and_publish_external',
-          notes: 'Authorized by operator via research studio interface',
-        });
-      }
+      await submitApprovalDecision(sessionId, {
+        decision: 'approve',
+        actionName: pendingApproval?.actionName || 'export_and_publish_external',
+        notes: 'Authorized by operator via research studio interface',
+      });
+
       setPendingApproval(null);
       setAgentStatus('completed');
 
@@ -405,35 +210,40 @@ export default function App() {
         {
           id: `t-approved-${Date.now()}`,
           type: 'thought',
-          content: 'Human editorial approval granted and logged to backend. Disseminating research report.',
+          content: 'Human editorial approval granted and recorded to database. Staged research publication released.',
           timestamp: new Date().toLocaleTimeString(),
         },
         {
           id: `t-tool-published-${Date.now()}`,
           type: 'observation',
           source: 'External Distribution Endpoint',
-          latencyMs: 94,
-          summary: 'External research release dispatched with cryptographic audit record: [VERIFIED_SIG_8892].',
+          latencyMs: 88,
+          summary: `External research briefing published for audience ${targetAudience}. Session ${sessionId} confirmed.`,
           timestamp: new Date().toLocaleTimeString(),
         },
       ]);
     } catch (err) {
-      alert(`Approval error: ${err.message}`);
+      setNetworkError(`Approval failed: ${err.message}`);
     } finally {
       setIsSubmittingApproval(false);
     }
   };
 
   const handleRejectAction = async () => {
+    if (!sessionId) {
+      setPendingApproval(null);
+      setAgentStatus('idle');
+      return;
+    }
+
     setIsSubmittingApproval(true);
     try {
-      if (sessionId) {
-        await submitApprovalDecision(sessionId, {
-          decision: 'reject',
-          actionName: pendingApproval?.actionName || 'export_and_publish_external',
-          notes: 'Rejected by operator: retained for internal review',
-        });
-      }
+      await submitApprovalDecision(sessionId, {
+        decision: 'reject',
+        actionName: pendingApproval?.actionName || 'export_and_publish_external',
+        notes: 'Rejected by operator: retained for internal review',
+      });
+
       setPendingApproval(null);
       setAgentStatus('idle');
 
@@ -447,7 +257,7 @@ export default function App() {
         },
       ]);
     } catch (err) {
-      alert(`Rejection error: ${err.message}`);
+      setNetworkError(`Rejection failed: ${err.message}`);
     } finally {
       setIsSubmittingApproval(false);
     }
@@ -456,9 +266,9 @@ export default function App() {
   // Trigger Human Approval Gate on demand
   const handleRequestExportApproval = () => {
     setPendingApproval({
-      actionName: 'export_and_publish_external',
+      actionName: 'publish_external_research_briefing',
       riskTier: 'EXTERNAL_DISSEMINATION',
-      riskReason: 'Publishing research findings to external channels or stakeholders requires explicit human editorial sign-off.',
+      riskReason: 'Publishing research findings to external channels requires explicit human editorial authorization.',
       payload: {
         documentTitle: finalReport?.title || 'Research Synthesis Report',
         targetAudience,
@@ -470,9 +280,9 @@ export default function App() {
     setAgentStatus('awaiting_approval');
   };
 
-  // Reset session
+  // Reset workspace
   const handleResetWorkspace = () => {
-    setResearchQuestion('');
+    setResearchQuestion(DEFAULT_QUESTION);
     setAgentStatus('idle');
     setSubQuestions([]);
     setTraces([]);
@@ -516,7 +326,8 @@ export default function App() {
                 <span className={`w-2 h-2 rounded-full ${backendStatus.online ? 'bg-emerald-400 anim-radar' : 'bg-amber-400'}`} />
               </div>
               <p className="text-[11px] text-slate-400">
-                Endpoint: <code className="text-cyan-300 font-mono">{import.meta.env.VITE_API_URL || 'http://localhost:5000'}</code>
+                Endpoint: <code className="text-cyan-300 font-mono">{getApiBaseUrl()}</code>
+                {sessionId && <span className="ml-2 text-slate-500 font-mono">Session: {sessionId}</span>}
               </p>
             </div>
           </div>
@@ -543,12 +354,12 @@ export default function App() {
           </div>
         </div>
 
-        {/* Network / Connection Error Toast */}
+        {/* Network / Connection Error Banner */}
         {networkError && (
-          <div className="p-3.5 rounded-xl bg-rose-950/50 border border-rose-700/80 text-rose-200 text-xs flex items-center justify-between gap-3 shadow-lg">
+          <div className="p-3.5 rounded-xl bg-rose-950/60 border border-rose-700/80 text-rose-200 text-xs flex items-center justify-between gap-3 shadow-lg">
             <div className="flex items-center gap-2.5">
               <AlertCircle className="w-4 h-4 text-rose-400 flex-shrink-0" />
-              <span>{networkError} (Tip: Ensure backend is running via <code>npm start</code> in the backend folder, or use the Scenario dropdown to test offline)</span>
+              <span>{networkError}</span>
             </div>
             <button
               type="button"
@@ -570,14 +381,13 @@ export default function App() {
             sourceTypes={sourceTypes}
             onSourceTypeToggle={handleSourceTypeToggle}
             onSubmitResearch={handleLaunchResearch}
-            scenario={scenario}
-            onScenarioChange={setScenario}
             isSearching={isSearching}
             onAskFollowUp={handleAskFollowUp}
+            hasActiveSession={Boolean(sessionId)}
           />
         </div>
 
-        {/* 5. Human Approval Gate (Inline Modal for External Dissemination) */}
+        {/* 5. Human Approval Gate (Pauses execution when PENDING_APPROVAL arrives) */}
         {pendingApproval && (
           <div className="anim-fade-up-2">
             <HumanApprovalModal
@@ -606,7 +416,7 @@ export default function App() {
           />
         </div>
 
-        {/* 6. Structured Research Report Panel (3 Sections) */}
+        {/* 6. Structured Research Report Panel */}
         {finalReport && (
           <div className="anim-fade-up-5">
             <FinalResultPanel
@@ -629,7 +439,7 @@ export default function App() {
           <span>• Theme 4: Research & Knowledge Agent</span>
         </div>
         <div className="flex items-center gap-3 text-[11px] text-slate-500 mt-2 sm:mt-0 font-mono">
-          <span>Backend Connected</span>
+          <span>Backend Connected ({getApiBaseUrl()})</span>
           <span>•</span>
           <span>Zero Frontend API Keys</span>
           <span>•</span>

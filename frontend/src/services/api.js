@@ -1,14 +1,22 @@
 /**
  * Frontend API Service for Theme 4 Research & Knowledge Agent Backend
- * Connects to Node.js + Express backend at VITE_API_URL or http://localhost:5000
+ * Connects to live Express backend at VITE_API_BASE_URL, VITE_API_URL, or http://localhost:5000
  */
 
-const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/+$/, '');
+const API_BASE = (
+  import.meta.env.VITE_API_BASE_URL ||
+  import.meta.env.VITE_API_URL ||
+  'http://localhost:5000'
+).replace(/\/+$/, '');
+
+export function getApiBaseUrl() {
+  return API_BASE;
+}
 
 export async function checkBackendHealth() {
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 3000);
+    const timeoutId = setTimeout(() => controller.abort(), 3500);
     const res = await fetch(`${API_BASE}/api/health`, { signal: controller.signal });
     clearTimeout(timeoutId);
 
@@ -20,6 +28,7 @@ export async function checkBackendHealth() {
         persistenceMode: data.persistenceMode || 'memory',
         geminiConfigured: Boolean(data.geminiConfigured),
         activeModel: data.activeModel || 'gemini-3.8-flash',
+        fallbackModel: data.fallbackModel || 'gemini-3.5-flash-lite',
       };
     }
     return { online: false, persistenceMode: 'offline', geminiConfigured: false };
@@ -102,7 +111,7 @@ export async function submitApprovalDecision(sessionId, { decision, actionName =
 
   if (!res.ok) {
     const errData = await res.json().catch(() => ({}));
-    throw new Error(errData.error || `Approval submission failed with status ${res.status}`);
+    throw new Error(errData.error || `Failed to submit approval: status ${res.status}`);
   }
 
   return await res.json();
