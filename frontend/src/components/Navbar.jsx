@@ -1,5 +1,6 @@
 import { Sparkles, RotateCcw, Cpu } from 'lucide-react';
-import { PROFESSIONS, getProfessionById } from '../constants/professions';
+import { getProfessionById } from '../constants/professions';
+import ProfessionDropdown from './ProfessionDropdown';
 
 export default function Navbar({
   agentStatus = 'idle',
@@ -72,23 +73,14 @@ export default function Navbar({
           </span>
         </div>
 
-        {/* Center / Right Hybrid Architecture Badge & Actions */}
+        {/* Center / Right Custom Profession Dropdown & Actions */}
         <div className="flex items-center gap-2 sm:gap-2.5">
-          {/* Quick Header Dropdown for Profession */}
-          <div className="relative">
-            <select
-              aria-label="Select Your Profession"
-              value={activeProf.id}
-              onChange={(e) => onProfessionChange?.(e.target.value)}
-              className={`bg-[#161F33] text-xs font-medium text-slate-200 border border-white/[0.12] rounded-xl px-2.5 py-1.5 focus:outline-none transition-all duration-300 cursor-pointer ${activeProf.theme.focusRing}`}
-            >
-              {PROFESSIONS.map((p) => (
-                <option key={p.id} value={p.id} className="bg-[#090D16] text-slate-200 py-1">
-                  {p.icon} {p.label}
-                </option>
-              ))}
-            </select>
-          </div>
+          {/* Custom Sleek Profession Dropdown */}
+          <ProfessionDropdown
+            selectedProfession={selectedProfession}
+            onSelectProfession={onProfessionChange}
+            compact={true}
+          />
 
           {/* Clickable Hybrid Architecture Badge */}
           <button

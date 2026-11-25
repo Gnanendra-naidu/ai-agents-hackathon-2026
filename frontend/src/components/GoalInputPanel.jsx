@@ -11,10 +11,10 @@ import {
   Loader2,
   Upload,
   Send,
-  Zap,
-  Briefcase
+  Zap
 } from 'lucide-react';
-import { PROFESSIONS, getProfessionById } from '../constants/professions';
+import { getProfessionById } from '../constants/professions';
+import ProfessionDropdown from './ProfessionDropdown';
 
 export default function GoalInputPanel({
   researchQuestion = '',
@@ -113,15 +113,15 @@ export default function GoalInputPanel({
     setFollowUpText('');
   };
 
-  const handleProfessionSelect = (profId) => {
-    const prof = getProfessionById(profId);
+  const handleProfessionSelect = (profValOrId) => {
+    const prof = getProfessionById(profValOrId);
     onAudienceChange?.(prof.value);
     onQuestionChange?.(prof.defaultQuestion);
   };
 
   return (
     <div className={`bg-[#111827]/90 border border-white/[0.08] ${activeProf.theme.cardHover} rounded-2xl p-5 sm:p-6 shadow-2xl backdrop-blur-xl transition-all duration-300 space-y-5`}>
-      {/* 1. Header with Profession Dropdown & Dynamic Mode Banner */}
+      {/* 1. Header with Custom Profession Dropdown & Mode Banner */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-1 border-b border-white/[0.06]">
         <div>
           <label htmlFor="research-question" className="text-base sm:text-lg font-bold text-slate-100 flex items-center gap-2">
@@ -129,35 +129,21 @@ export default function GoalInputPanel({
             <span>What would you like to research?</span>
           </label>
           <p className="text-xs text-slate-400 mt-0.5">
-            Targeting report style &amp; focus for: <strong className={`${activeProf.theme.textAccent} transition-colors duration-300`}>{activeProf.description}</strong>
+            Perspective: <strong className={`${activeProf.theme.textAccent} transition-colors duration-300`}>{activeProf.subtitle}</strong>
           </p>
         </div>
 
-        {/* Clean Profession Dropdown Selector */}
-        <div className="flex flex-wrap items-center gap-2.5">
-          <label htmlFor="profession-dropdown" className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-            <Briefcase className="w-3.5 h-3.5 text-slate-400" />
-            <span>Select Your Profession:</span>
-          </label>
-
-          <div className="relative">
-            <select
-              id="profession-dropdown"
-              value={activeProf.id}
-              onChange={(e) => handleProfessionSelect(e.target.value)}
-              className={`bg-[#090D16] text-xs font-bold text-slate-100 border border-white/[0.12] rounded-xl px-3 py-2 focus:outline-none transition-all duration-300 cursor-pointer shadow-inner pr-8 ${activeProf.theme.focusRing}`}
-            >
-              {PROFESSIONS.map((p) => (
-                <option key={p.id} value={p.id} className="bg-[#090D16] text-slate-200 py-1.5 font-sans">
-                  {p.icon} {p.label}
-                </option>
-              ))}
-            </select>
-          </div>
+        {/* Custom Interactive Profession Dropdown Menu */}
+        <div className="flex flex-wrap items-center gap-3">
+          <ProfessionDropdown
+            selectedProfession={activeProf.value}
+            onSelectProfession={handleProfessionSelect}
+            compact={false}
+          />
 
           {/* Active Mode Badge Pill */}
           <span
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border transition-all duration-300 shadow-sm ${activeProf.theme.badgeBg}`}
+            className={`hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold border transition-all duration-300 shadow-sm ${activeProf.theme.badgeBg}`}
           >
             <span>{activeProf.icon}</span>
             <span>{activeProf.tag}</span>
@@ -165,7 +151,7 @@ export default function GoalInputPanel({
         </div>
       </div>
 
-      {/* 2. Main Question Textarea with Dynamic Border / Focus Ring */}
+      {/* 2. Main Question Textarea with Dynamic Focus Ring */}
       <textarea
         id="research-question"
         rows="3"
@@ -332,7 +318,7 @@ export default function GoalInputPanel({
         </div>
       </div>
 
-      {/* 5. Bottom Actions: Follow-Up & Primary Start Button Styled by Theme */}
+      {/* 5. Bottom Actions: Follow-Up & Primary Start Button */}
       <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-t border-white/[0.06]">
         {/* Follow-up question bar */}
         <form onSubmit={handleFollowUpSubmit} className="flex-1 flex items-center gap-2">

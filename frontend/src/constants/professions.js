@@ -7,6 +7,7 @@ export const PROFESSIONS = [
     label: 'Students',
     icon: '🎓',
     tag: '🎓 Mode: Students',
+    subtitle: 'Clear explanations, study notes & exam-ready summaries',
     description: 'Study concepts, exam prep & digestible explanations',
     theme: {
       name: 'emerald',
@@ -23,6 +24,9 @@ export const PROFESSIONS = [
       borderAccent: 'border-emerald-500/40',
       cardHover: 'hover:border-emerald-500/30',
       presetBorder: 'hover:border-emerald-500/50 hover:text-emerald-300',
+      rowActiveBg: 'bg-emerald-950/60 border-emerald-500/50 text-emerald-200',
+      rowHoverBg: 'hover:bg-emerald-950/30',
+      dotColor: 'bg-[#10B981]',
     },
     samplePrompts: [
       'Explain multi-agent AI with simple real-world study analogies',
@@ -37,6 +41,7 @@ export const PROFESSIONS = [
     label: 'Researchers',
     icon: '🔬',
     tag: '🔬 Mode: Researchers',
+    subtitle: 'Deep academic citations, methodology & literature synthesis',
     description: 'Scholarly citations, empirical benchmarks & peer review rigour',
     theme: {
       name: 'indigo',
@@ -53,6 +58,9 @@ export const PROFESSIONS = [
       borderAccent: 'border-indigo-500/40',
       cardHover: 'hover:border-indigo-500/30',
       presetBorder: 'hover:border-indigo-500/50 hover:text-indigo-300',
+      rowActiveBg: 'bg-indigo-950/60 border-indigo-500/50 text-indigo-200',
+      rowHoverBg: 'hover:bg-indigo-950/30',
+      dotColor: 'bg-[#4F46E5]',
     },
     samplePrompts: [
       'Synthesize empirical benchmark papers on multi-agent consensus latency',
@@ -67,6 +75,7 @@ export const PROFESSIONS = [
     label: 'Founders',
     icon: '🚀',
     tag: '🚀 Mode: Founders',
+    subtitle: 'Market insights, competitor analysis & executive takeaways',
     description: 'Market viability, unit economics, ROI & competitor moat',
     theme: {
       name: 'amber',
@@ -83,6 +92,9 @@ export const PROFESSIONS = [
       borderAccent: 'border-amber-500/40',
       cardHover: 'hover:border-amber-500/30',
       presetBorder: 'hover:border-amber-500/50 hover:text-amber-300',
+      rowActiveBg: 'bg-amber-950/60 border-amber-500/50 text-amber-200',
+      rowHoverBg: 'hover:bg-amber-950/30',
+      dotColor: 'bg-[#F59E0B]',
     },
     samplePrompts: [
       'What are the commercial ROI and unit economics of deploying autonomous AI agents in production?',
@@ -97,6 +109,7 @@ export const PROFESSIONS = [
     label: 'Journalists',
     icon: '📰',
     tag: '📰 Mode: Journalists',
+    subtitle: 'Fact-checked claims, primary sources & investigative angles',
     description: 'Fact-checking, claim verification, conflict analysis & source scrutiny',
     theme: {
       name: 'crimson',
@@ -113,6 +126,9 @@ export const PROFESSIONS = [
       borderAccent: 'border-rose-500/40',
       cardHover: 'hover:border-rose-500/30',
       presetBorder: 'hover:border-rose-500/50 hover:text-rose-300',
+      rowActiveBg: 'bg-rose-950/60 border-rose-500/50 text-rose-200',
+      rowHoverBg: 'hover:bg-rose-950/30',
+      dotColor: 'bg-[#E11D48]',
     },
     samplePrompts: [
       'Fact-check major public claims regarding AI agent autonomy vs actual capabilities',
