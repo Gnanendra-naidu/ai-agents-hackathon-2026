@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import GoalInputPanel from './components/GoalInputPanel';
+import FinalResultPanel from './components/FinalResultPanel';
+import ResearchProgressTracker from './components/ResearchProgressTracker';
 import AgentPlanCard from './components/AgentPlanCard';
 import ExecutionTimeline from './components/ExecutionTimeline';
 import HumanApprovalModal from './components/HumanApprovalModal';
-import FinalResultPanel from './components/FinalResultPanel';
-import { BookOpen, Server, RefreshCw, Cpu, Database, AlertCircle } from 'lucide-react';
+import { BookOpen, AlertCircle, ChevronDown, ChevronUp, Terminal, Cpu, Database, Server } from 'lucide-react';
 import { checkBackendHealth, executeResearch, submitApprovalDecision, getApiBaseUrl } from './services/api';
 
-const DEFAULT_QUESTION = 'What are the verified economic trade-offs, hallucination rates, and human-in-the-loop bottlenecks of multi-agent AI frameworks in production?';
+const DEFAULT_QUESTION = 'What are the pros and cons of multi-agent AI?';
 
 export default function App() {
   const [researchQuestion, setResearchQuestion] = useState(DEFAULT_QUESTION);
@@ -24,6 +25,7 @@ export default function App() {
   const [isSearching, setIsSearching] = useState(false);
   const [isSubmittingApproval, setIsSubmittingApproval] = useState(false);
   const [networkError, setNetworkError] = useState(null);
+  const [showTechnicalDetails, setShowTechnicalDetails] = useState(false);
 
   // Backend Live Health State
   const [backendStatus, setBackendStatus] = useState({
@@ -140,7 +142,7 @@ export default function App() {
 
   // Follow-up question submission
   const handleAskFollowUp = async (query) => {
-    if (!query.trim()) return;
+    if (!query || !query.trim()) return;
 
     setNetworkError(null);
     setIsSearching(true);
@@ -282,7 +284,7 @@ export default function App() {
 
   // Reset workspace
   const handleResetWorkspace = () => {
-    setResearchQuestion(DEFAULT_QUESTION);
+    setResearchQuestion('');
     setAgentStatus('idle');
     setSubQuestions([]);
     setTraces([]);
@@ -291,6 +293,7 @@ export default function App() {
     setFinalReport(null);
     setSessionId(null);
     setNetworkError(null);
+    setShowTechnicalDetails(false);
     setMetrics({ subQuestionsVerified: 0, sourcesAnalyzed: 0, conflictsReconciled: 0, estimatedTokens: 0, latencySec: '0.0' });
   };
 
@@ -303,147 +306,155 @@ export default function App() {
         <div className="absolute bottom-1/3 left-1/3 w-[500px] h-[300px] bg-emerald-600/[0.05] rounded-full blur-[130px]" />
       </div>
 
-      {/* 1. Navbar */}
+      {/* 1. Simplified Top Header */}
       <Navbar
         agentStatus={agentStatus}
         backendStatus={backendStatus}
         onResetWorkspace={handleResetWorkspace}
       />
 
-      {/* Main Workspace Body */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 relative z-10">
-        {/* Real Live Backend Status Banner */}
-        <div className="anim-fade-up-1 flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-2xl bg-[#111827]/85 border border-white/[0.08] text-xs shadow-md backdrop-blur-xl">
-          <div className="flex items-center gap-3">
-            <div className={`p-1.5 rounded-lg border ${backendStatus.online ? 'bg-emerald-950/70 border-emerald-700/80 text-emerald-400' : 'bg-amber-950/70 border-amber-700/80 text-amber-400'}`}>
-              <Server className="w-4 h-4" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="font-bold text-slate-100">
-                  Backend API: {backendStatus.online ? 'Connected & Healthy' : 'Offline / Standby (Click Refresh)'}
-                </span>
-                <span className={`w-2 h-2 rounded-full ${backendStatus.online ? 'bg-emerald-400 anim-radar' : 'bg-amber-400'}`} />
-              </div>
-              <p className="text-[11px] text-slate-400">
-                Endpoint: <code className="text-cyan-300 font-mono">{getApiBaseUrl()}</code>
-                {sessionId && <span className="ml-2 text-slate-500 font-mono">Session: {sessionId}</span>}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 text-[11px] font-mono px-2.5 py-1 rounded-lg bg-[#090D16] border border-white/[0.06] text-slate-300">
-              <Database className="w-3 h-3 text-emerald-400" />
-              <span>Storage: <strong className="text-slate-100 capitalize">{backendStatus.persistenceMode}</strong></span>
-            </span>
-
-            <span className="inline-flex items-center gap-1.5 text-[11px] font-mono px-2.5 py-1 rounded-lg bg-[#090D16] border border-white/[0.06] text-slate-300">
-              <Cpu className="w-3 h-3 text-violet-400" />
-              <span>Gemini: <strong className="text-slate-100">{backendStatus.geminiConfigured ? backendStatus.activeModel : 'Fallback / Heuristic Active'}</strong></span>
-            </span>
-
-            <button
-              type="button"
-              onClick={handleRefreshHealth}
-              className="p-1.5 rounded-lg bg-[#161F33] hover:bg-[#1E293B] text-slate-300 hover:text-cyan-300 border border-white/[0.08] transition-colors"
-              title="Re-check backend API health"
-            >
-              <RefreshCw className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </div>
-
+      {/* Main Container */}
+      <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 relative z-10">
         {/* Network / Connection Error Banner */}
         {networkError && (
-          <div className="p-3.5 rounded-xl bg-rose-950/60 border border-rose-700/80 text-rose-200 text-xs flex items-center justify-between gap-3 shadow-lg">
+          <div className="p-4 rounded-xl bg-rose-950/70 border border-rose-700 text-rose-200 text-xs sm:text-sm flex items-center justify-between gap-3 shadow-lg animate-in fade-in">
             <div className="flex items-center gap-2.5">
-              <AlertCircle className="w-4 h-4 text-rose-400 flex-shrink-0" />
+              <AlertCircle className="w-5 h-5 text-rose-400 flex-shrink-0" />
               <span>{networkError}</span>
             </div>
             <button
               type="button"
               onClick={() => handleLaunchResearch()}
-              className="px-3 py-1 rounded-lg bg-rose-900 hover:bg-rose-800 text-white font-medium text-xs transition-colors flex-shrink-0"
+              className="px-3.5 py-1.5 rounded-lg bg-rose-900 hover:bg-rose-800 text-white font-medium text-xs transition-colors flex-shrink-0"
             >
-              Retry Call
+              Retry
             </button>
           </div>
         )}
 
-        {/* 2. Research Input & Audience Panel */}
-        <div className="anim-fade-up-2">
-          <GoalInputPanel
-            researchQuestion={researchQuestion}
-            onQuestionChange={setResearchQuestion}
-            targetAudience={targetAudience}
-            onAudienceChange={setTargetAudience}
-            sourceTypes={sourceTypes}
-            onSourceTypeToggle={handleSourceTypeToggle}
-            onSubmitResearch={handleLaunchResearch}
-            isSearching={isSearching}
-            onAskFollowUp={handleAskFollowUp}
-            hasActiveSession={Boolean(sessionId)}
-          />
-        </div>
+        {/* 2. Main Guided Input Area */}
+        <GoalInputPanel
+          researchQuestion={researchQuestion}
+          onQuestionChange={setResearchQuestion}
+          targetAudience={targetAudience}
+          onAudienceChange={setTargetAudience}
+          sourceTypes={sourceTypes}
+          onSourceTypeToggle={handleSourceTypeToggle}
+          onSubmitResearch={handleLaunchResearch}
+          isSearching={isSearching}
+          onAskFollowUp={handleAskFollowUp}
+          hasActiveSession={Boolean(sessionId || finalReport)}
+        />
 
-        {/* 5. Human Approval Gate (Pauses execution when PENDING_APPROVAL arrives) */}
-        {pendingApproval && (
-          <div className="anim-fade-up-2">
-            <HumanApprovalModal
-              approvalRequest={pendingApproval}
-              onApprove={handleApproveAction}
-              onReject={handleRejectAction}
-              isSubmitting={isSubmittingApproval}
-            />
-          </div>
+        {/* 3. Simple 3-Step Progress Tracker while Researching */}
+        {isSearching && (
+          <ResearchProgressTracker
+            tracesCount={traces.length}
+            subQuestionsCount={subQuestions.length}
+          />
         )}
 
-        {/* 3. Sub-Question Decomposition & Execution Plan */}
-        <div className="anim-fade-up-3">
-          <AgentPlanCard
-            subQuestions={subQuestions}
+        {/* 4. Human Approval Gate (Pauses execution when action requires signoff) */}
+        {pendingApproval && (
+          <HumanApprovalModal
+            approvalRequest={pendingApproval}
+            onApprove={handleApproveAction}
+            onReject={handleRejectAction}
+            isSubmitting={isSubmittingApproval}
           />
-        </div>
+        )}
 
-        {/* 4. Execution Timeline, Citations & Conflict Flags */}
-        <div className="anim-fade-up-4">
-          <ExecutionTimeline
-            traces={traces}
-            conflictFlag={conflictFlag}
-            onSimulateRetry={() => handleLaunchResearch()}
-            liveEngine={true}
-          />
-        </div>
-
-        {/* 6. Structured Research Report Panel */}
+        {/* 5. Clean Final Report View (Displayed right below input for readability) */}
         {finalReport && (
-          <div className="anim-fade-up-5">
-            <FinalResultPanel
-              report={finalReport}
-              metrics={metrics}
-              backendStatus={backendStatus}
-              persistenceMode={backendStatus.persistenceMode}
-              onRequestExportApproval={handleRequestExportApproval}
-              onReset={handleResetWorkspace}
-            />
+          <FinalResultPanel
+            report={finalReport}
+            onRequestExportApproval={handleRequestExportApproval}
+            onSelectFollowUp={handleAskFollowUp}
+          />
+        )}
+
+        {/* 6. Collapsed Technical Details Accordion (For Judges & Proof) */}
+        {(traces.length > 0 || subQuestions.length > 0) && (
+          <div className="pt-2">
+            <button
+              type="button"
+              onClick={() => setShowTechnicalDetails((v) => !v)}
+              className="w-full flex items-center justify-between p-3.5 rounded-xl bg-[#111827]/60 hover:bg-[#111827] border border-white/[0.06] hover:border-white/[0.12] text-xs text-slate-400 hover:text-slate-200 transition-all shadow-sm"
+            >
+              <div className="flex items-center gap-2">
+                <Terminal className="w-4 h-4 text-cyan-400" />
+                <span className="font-semibold text-slate-300">
+                  {showTechnicalDetails ? 'Hide AI Thinking & Technical Details' : 'Show AI Thinking & Technical Details'}
+                </span>
+                <span className="text-[11px] font-mono px-2 py-0.5 rounded-md bg-[#090D16] text-slate-400 border border-white/[0.06]">
+                  {traces.length} events • {subQuestions.length} sub-questions
+                </span>
+              </div>
+              {showTechnicalDetails ? (
+                <ChevronUp className="w-4 h-4 text-slate-400" />
+              ) : (
+                <ChevronDown className="w-4 h-4 text-slate-400" />
+              )}
+            </button>
+
+            {/* Collapsible Content */}
+            {showTechnicalDetails && (
+              <div className="mt-4 space-y-5 animate-in fade-in duration-200">
+                {/* Technical Environment & Session Card */}
+                <div className="p-3.5 rounded-xl bg-[#090D16]/80 border border-white/[0.06] flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-slate-400">
+                  <div className="flex items-center gap-2">
+                    <Server className="w-3.5 h-3.5 text-cyan-400" />
+                    <span>Backend: <code className="text-cyan-300">{getApiBaseUrl()}</code></span>
+                    {sessionId && <span className="text-slate-500">• ID: {sessionId}</span>}
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="flex items-center gap-1.5">
+                      <Database className="w-3.5 h-3.5 text-emerald-400" />
+                      <span>Persistence: <strong className="text-slate-200 capitalize">{backendStatus.persistenceMode}</strong></span>
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <Cpu className="w-3.5 h-3.5 text-violet-400" />
+                      <span>Model: <strong className="text-slate-200">{backendStatus.activeModel}</strong></span>
+                    </span>
+                  </div>
+                </div>
+
+                {/* Sub-Question Decomposition Plan */}
+                <AgentPlanCard subQuestions={subQuestions} />
+
+                {/* Live Execution Timeline, Citations & Conflict Alert */}
+                <ExecutionTimeline
+                  traces={traces}
+                  conflictFlag={conflictFlag}
+                  onSimulateRetry={() => handleLaunchResearch()}
+                  liveEngine={true}
+                />
+
+                {/* Technical Execution Metrics */}
+                <div className="p-3.5 rounded-xl bg-[#090D16]/70 border border-white/[0.06] flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-slate-400">
+                  <span>Sub-Questions Verified: <strong className="text-slate-200">{metrics.subQuestionsVerified}</strong></span>
+                  <span>Sources Analyzed: <strong className="text-slate-200">{metrics.sourcesAnalyzed}</strong></span>
+                  <span>Conflicts Reconciled: <strong className="text-slate-200">{metrics.conflictsReconciled}</strong></span>
+                  <span>Estimated Tokens: <strong className="text-slate-200">{metrics.estimatedTokens}</strong></span>
+                  <span>Execution Latency: <strong className="text-slate-200">{metrics.latencySec}s</strong></span>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-white/[0.08] bg-[#090D16] py-6 px-4 text-center text-xs text-slate-500 relative z-10 flex flex-col sm:flex-row items-center justify-between max-w-7xl mx-auto w-full">
+      {/* Simplified Clean Footer */}
+      <footer className="border-t border-white/[0.08] bg-[#090D16] py-6 px-4 text-center text-xs text-slate-500 relative z-10 flex flex-col sm:flex-row items-center justify-between max-w-5xl mx-auto w-full">
         <div className="flex items-center gap-2">
           <BookOpen className="w-4 h-4 text-cyan-400" />
-          <span className="font-semibold text-slate-400">Agentic Mode-AI</span>
-          <span>• Theme 4: Research & Knowledge Agent</span>
+          <span className="font-semibold text-slate-300">Agentic Mode-AI</span>
+          <span>• Research &amp; Knowledge Agent</span>
         </div>
-        <div className="flex items-center gap-3 text-[11px] text-slate-500 mt-2 sm:mt-0 font-mono">
-          <span>Backend Connected ({getApiBaseUrl()})</span>
+        <div className="flex items-center gap-2 text-[11px] text-slate-500 mt-2 sm:mt-0 font-sans">
+          <span>Dual Real Tools (Wikipedia/Crossref &amp; Documents)</span>
           <span>•</span>
-          <span>Zero Frontend API Keys</span>
-          <span>•</span>
-          <span>Supabase / Memory Store</span>
+          <span>Human-in-the-Loop Safeguards</span>
         </div>
       </footer>
     </div>
