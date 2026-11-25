@@ -1,4 +1,4 @@
-import { Sparkles, RotateCcw, Cpu, PlayCircle } from 'lucide-react';
+import { Sparkles, RotateCcw, Cpu, PlayCircle, Film } from 'lucide-react';
 import { getProfessionById } from '../constants/professions';
 
 export default function Navbar({
@@ -8,6 +8,7 @@ export default function Navbar({
   onOpenArchitecture,
   selectedProfession = 'Students',
   onOpenDemo,
+  onReplaySplash,
 }) {
   const activeProf = getProfessionById(selectedProfession);
 
@@ -74,16 +75,26 @@ export default function Navbar({
 
         {/* Center / Right Header Badges & Actions */}
         <div className="flex items-center gap-2 sm:gap-2.5">
-          {/* Quick Demo Button to replay Welcome Intro */}
+          {/* Replay Full-Screen Cinematic Splash Intro */}
+          <button
+            type="button"
+            onClick={onReplaySplash}
+            className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border border-slate-300 transition-all active:scale-95 shadow-2xs cursor-pointer"
+            title="Replay full-screen cinematic splash intro"
+          >
+            <Film className="w-3.5 h-3.5 text-indigo-600" />
+            <span className="hidden sm:inline">Replay Intro</span>
+          </button>
+
+          {/* Quick Demo Walkthrough Button */}
           <button
             type="button"
             onClick={onOpenDemo}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border border-slate-200 transition-all active:scale-95 shadow-2xs cursor-pointer"
+            className="hidden xs:inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border border-slate-300 transition-all active:scale-95 shadow-2xs cursor-pointer"
             title="Watch 12-second animated product preview"
           >
             <PlayCircle className="w-3.5 h-3.5 text-cyan-600" />
-            <span className="hidden sm:inline">Watch Quick Demo</span>
-            <span className="sm:hidden">Demo</span>
+            <span className="hidden md:inline">Quick Demo</span>
           </button>
 
           {/* Clickable Hybrid Architecture Badge */}
@@ -99,7 +110,7 @@ export default function Navbar({
 
           {/* Simple Clean Status Pill */}
           <div
-            className={`hidden xs:inline-flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-full border shadow-xs ${status.badge}`}
+            className={`hidden sm:inline-flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-full border shadow-xs ${status.badge}`}
           >
             <span className={`w-2 h-2 rounded-full ${status.dot}`} />
             <span>{status.label}</span>
@@ -109,11 +120,11 @@ export default function Navbar({
           <button
             type="button"
             onClick={onResetWorkspace}
-            className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border border-slate-200 transition-all active:scale-95 shadow-xs cursor-pointer"
+            className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border border-slate-300 transition-all active:scale-95 shadow-xs cursor-pointer"
             title="Start a fresh research topic"
           >
             <RotateCcw className="w-3.5 h-3.5 text-slate-500" />
-            <span className="hidden md:inline">New Research</span>
+            <span className="hidden lg:inline">New Research</span>
           </button>
         </div>
       </div>

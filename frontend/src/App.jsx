@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
+import SplashIntro from './components/SplashIntro';
 import WelcomeIntro from './components/WelcomeIntro';
 import GoalInputPanel from './components/GoalInputPanel';
 import FinalResultPanel from './components/FinalResultPanel';
@@ -30,9 +31,21 @@ export default function App() {
   const [networkError, setNetworkError] = useState(null);
   const [showTechnicalDetails, setShowTechnicalDetails] = useState(false);
   const [isArchModalOpen, setIsArchModalOpen] = useState(false);
+  const [showSplash, setShowSplash] = useState(() => {
+    return sessionStorage.getItem('hasSeenSplash') !== 'true';
+  });
   const [showWelcomeIntro, setShowWelcomeIntro] = useState(() => {
     return sessionStorage.getItem('agentic_welcome_dismissed') !== 'true';
   });
+
+  const handleCompleteSplash = () => {
+    setShowSplash(false);
+    sessionStorage.setItem('hasSeenSplash', 'true');
+  };
+
+  const handleReplaySplash = () => {
+    setShowSplash(true);
+  };
 
   const handleDismissIntro = () => {
     setShowWelcomeIntro(false);
@@ -328,6 +341,13 @@ export default function App() {
         <div className={`absolute bottom-1/3 left-1/3 w-[500px] h-[300px] ${activeProf.theme.glowBottom} rounded-full blur-[130px] transition-all duration-700`} />
       </div>
 
+      {/* Dynamic Full-Screen Cinematic Splash Intro */}
+      <SplashIntro
+        isOpen={showSplash}
+        onComplete={handleCompleteSplash}
+        selectedProfession={selectedProfession}
+      />
+
       {/* 1. Top Header with Active Role Badge */}
       <Navbar
         agentStatus={agentStatus}
@@ -336,6 +356,7 @@ export default function App() {
         onOpenArchitecture={() => setIsArchModalOpen(true)}
         selectedProfession={selectedProfession}
         onOpenDemo={handleOpenIntro}
+        onReplaySplash={handleReplaySplash}
       />
 
       {/* Hybrid Architecture Transparency Modal */}
