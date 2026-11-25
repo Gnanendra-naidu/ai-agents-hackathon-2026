@@ -9,12 +9,13 @@ import HumanApprovalModal from './components/HumanApprovalModal';
 import ArchitectureModal, { SystemTransparencyCard } from './components/ArchitectureModal';
 import { BookOpen, AlertCircle, ChevronDown, ChevronUp, Terminal, Cpu, Database, Server } from 'lucide-react';
 import { checkBackendHealth, executeResearch, submitApprovalDecision, getApiBaseUrl } from './services/api';
-
-const DEFAULT_QUESTION = 'What are the pros and cons of multi-agent AI?';
+import { getProfessionById } from './constants/professions';
 
 export default function App() {
-  const [researchQuestion, setResearchQuestion] = useState(DEFAULT_QUESTION);
-  const [targetAudience, setTargetAudience] = useState('Researchers');
+  const [selectedProfession, setSelectedProfession] = useState('Students');
+  const activeProf = getProfessionById(selectedProfession);
+
+  const [researchQuestion, setResearchQuestion] = useState(activeProf.defaultQuestion);
   const [sourceTypes, setSourceTypes] = useState({ webSearch: true, knowledgeBase: true });
   const [agentStatus, setAgentStatus] = useState('idle'); // 'idle' | 'searching' | 'awaiting_approval' | 'completed' | 'conflict_detected' | 'error'
   const [subQuestions, setSubQuestions] = useState([]);
@@ -68,6 +69,12 @@ export default function App() {
     };
   }, []);
 
+  const handleProfessionChange = (profIdOrVal) => {
+    const prof = getProfessionById(profIdOrVal);
+    setSelectedProfession(prof.value);
+    setResearchQuestion(prof.defaultQuestion);
+  };
+
   const handleSourceTypeToggle = (key) => {
     setSourceTypes((prev) => ({ ...prev, [key]: !prev[key] }));
   };
@@ -84,7 +91,7 @@ export default function App() {
     setAgentStatus('searching');
 
     setSubQuestions([
-      { id: 'sq-init-1', title: `Decomposing primary dimensions for: "${researchQuestion.slice(0, 45)}..."`, status: 'searching' },
+      { id: 'sq-init-1', title: `Decomposing primary dimensions for ${activeProf.label}: "${researchQuestion.slice(0, 45)}..."`, status: 'searching' },
       { id: 'sq-init-2', title: 'Connecting to live web search & knowledge base tools', status: 'pending' },
     ]);
 
@@ -92,7 +99,7 @@ export default function App() {
       {
         id: `t-init-${Date.now()}`,
         type: 'thought',
-        content: `Dispatching research query to Express backend at ${getApiBaseUrl()}. Invoking Gemini sub-question planner and tool calling engine.`,
+        content: `Dispatching research query to Express backend at ${getApiBaseUrl()} targeting audience: ${activeProf.value}. Invoking Gemini native tool caller.`,
         timestamp: new Date().toLocaleTimeString(),
       },
     ]);
@@ -100,7 +107,7 @@ export default function App() {
     try {
       const data = await executeResearch({
         question: researchQuestion,
-        audience: targetAudience,
+        audience: activeProf.value,
         enabledSources: sourceTypes,
         uploadedNotes: uploadedNotes || undefined,
         sessionId: undefined,
@@ -155,7 +162,7 @@ export default function App() {
       {
         id: `t-followup-${Date.now()}`,
         type: 'thought',
-        content: `Follow-up inquiry submitted: "${query}". Calling backend with active session ${sessionId || 'new'}.`,
+        content: `Follow-up inquiry submitted: "${query}" for ${activeProf.value}. Calling backend with active session ${sessionId || 'new'}.`,
         timestamp: new Date().toLocaleTimeString(),
       },
     ]);
@@ -163,7 +170,7 @@ export default function App() {
     try {
       const data = await executeResearch({
         question: researchQuestion,
-        audience: targetAudience,
+        audience: activeProf.value,
         enabledSources: sourceTypes,
         sessionId: sessionId || undefined,
         followUpQuestion: query,
@@ -190,7 +197,7 @@ export default function App() {
     }
   };
 
-  // Real Human Approval Gate Handler: Calls POST /api/research/:sessionId/approval
+  // Human Approval Gate Handler: Calls POST /api/research/:sessionId/approval
   const handleApproveAction = async () => {
     if (!sessionId) {
       setPendingApproval(null);
@@ -203,7 +210,7 @@ export default function App() {
       await submitApprovalDecision(sessionId, {
         decision: 'approve',
         actionName: pendingApproval?.actionName || 'export_and_publish_external',
-        notes: 'Authorized by operator via research studio interface',
+        notes: `Authorized by operator via research studio interface for ${activeProf.value}`,
       });
 
       setPendingApproval(null);
@@ -222,7 +229,7 @@ export default function App() {
           type: 'observation',
           source: 'External Distribution Endpoint',
           latencyMs: 88,
-          summary: `External research briefing published for audience ${targetAudience}. Session ${sessionId} confirmed.`,
+          summary: `External research briefing published for ${activeProf.value}. Session ${sessionId} confirmed.`,
           timestamp: new Date().toLocaleTimeString(),
         },
       ]);
@@ -275,7 +282,7 @@ export default function App() {
       riskReason: 'Publishing research findings to external channels requires explicit human editorial authorization.',
       payload: {
         documentTitle: finalReport?.title || 'Research Synthesis Report',
-        targetAudience,
+        targetAudience: activeProf.value,
         verifiedSubQuestionsCount: subQuestions.filter((q) => q.status === 'verified').length,
         exportFormat: 'Markdown & PDF Package',
         stagedAt: new Date().toISOString(),
@@ -286,7 +293,7 @@ export default function App() {
 
   // Reset workspace
   const handleResetWorkspace = () => {
-    setResearchQuestion('');
+    setResearchQuestion(activeProf.defaultQuestion);
     setAgentStatus('idle');
     setSubQuestions([]);
     setTraces([]);
@@ -300,20 +307,22 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#090D16] text-slate-100 flex flex-col font-sans selection:bg-cyan-500/30 relative overflow-x-hidden">
-      {/* Ambient Radial Gradient Glows */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-        <div className="absolute top-0 left-1/4 -translate-x-1/2 w-[600px] h-[350px] bg-cyan-600/[0.08] rounded-full blur-[140px]" />
-        <div className="absolute top-1/4 right-1/4 translate-x-1/2 w-[550px] h-[350px] bg-violet-600/[0.07] rounded-full blur-[140px]" />
-        <div className="absolute bottom-1/3 left-1/3 w-[500px] h-[300px] bg-emerald-600/[0.05] rounded-full blur-[130px]" />
+    <div className="min-h-screen bg-[#090D16] text-slate-100 flex flex-col font-sans selection:bg-cyan-500/30 relative overflow-x-hidden transition-colors duration-300">
+      {/* Dynamic Ambient Radial Gradient Glows matching Active Profession Theme */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0 transition-all duration-700">
+        <div className={`absolute top-0 left-1/4 -translate-x-1/2 w-[650px] h-[380px] ${activeProf.theme.glowTop} rounded-full blur-[140px] transition-all duration-700`} />
+        <div className="absolute top-1/4 right-1/4 translate-x-1/2 w-[550px] h-[350px] bg-violet-600/[0.06] rounded-full blur-[140px]" />
+        <div className={`absolute bottom-1/3 left-1/3 w-[500px] h-[300px] ${activeProf.theme.glowBottom} rounded-full blur-[130px] transition-all duration-700`} />
       </div>
 
-      {/* 1. Simplified Top Header */}
+      {/* 1. Top Header with Synchronized Dropdown & Theme Badges */}
       <Navbar
         agentStatus={agentStatus}
         backendStatus={backendStatus}
         onResetWorkspace={handleResetWorkspace}
         onOpenArchitecture={() => setIsArchModalOpen(true)}
+        selectedProfession={selectedProfession}
+        onProfessionChange={handleProfessionChange}
       />
 
       {/* Hybrid Architecture Transparency Modal */}
@@ -341,12 +350,12 @@ export default function App() {
           </div>
         )}
 
-        {/* 2. Main Guided Input Area */}
+        {/* 2. Main Guided Input Area with Dynamic Profession Dropdown & Themes */}
         <GoalInputPanel
           researchQuestion={researchQuestion}
           onQuestionChange={setResearchQuestion}
-          targetAudience={targetAudience}
-          onAudienceChange={setTargetAudience}
+          targetAudience={selectedProfession}
+          onAudienceChange={handleProfessionChange}
           sourceTypes={sourceTypes}
           onSourceTypeToggle={handleSourceTypeToggle}
           onSubmitResearch={handleLaunchResearch}
@@ -355,7 +364,7 @@ export default function App() {
           hasActiveSession={Boolean(sessionId || finalReport)}
         />
 
-        {/* 3. Simple 3-Step Progress Tracker while Researching */}
+        {/* 3. Simple Progress Tracker while Researching */}
         {isSearching && (
           <ResearchProgressTracker
             tracesCount={traces.length}
@@ -373,7 +382,25 @@ export default function App() {
           />
         )}
 
-        {/* 5. Clean Final Report View (Displayed right below input for readability) */}
+        {/* Dynamic Active Role Banner before Report */}
+        {finalReport && (
+          <div className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-[#111827]/70 border border-white/[0.08] backdrop-blur-md transition-all duration-300">
+            <div className="flex items-center gap-2">
+              <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${activeProf.theme.badgeBg}`}>
+                <span>{activeProf.icon}</span>
+                <span>Active Role: {activeProf.label}</span>
+              </span>
+              <span className="text-xs text-slate-400 hidden sm:inline">
+                Tailored for {activeProf.description}
+              </span>
+            </div>
+            <span className="text-xs font-mono text-slate-400">
+              Verified with 100% Citation Grounding
+            </span>
+          </div>
+        )}
+
+        {/* 5. Clean Final Report View */}
         {finalReport && (
           <FinalResultPanel
             report={finalReport}
@@ -394,7 +421,7 @@ export default function App() {
               className="w-full flex items-center justify-between p-3.5 rounded-xl bg-[#111827]/60 hover:bg-[#111827] border border-white/[0.06] hover:border-white/[0.12] text-xs text-slate-400 hover:text-slate-200 transition-all shadow-sm"
             >
               <div className="flex items-center gap-2">
-                <Terminal className="w-4 h-4 text-cyan-400" />
+                <Terminal className={`w-4 h-4 ${activeProf.theme.textAccent} transition-colors duration-300`} />
                 <span className="font-semibold text-slate-300">
                   {showTechnicalDetails ? 'Hide Raw Agent Execution Trace' : 'View Raw Agent Execution Trace'}
                 </span>
@@ -415,7 +442,7 @@ export default function App() {
                 {/* Technical Environment & Session Card */}
                 <div className="p-3.5 rounded-xl bg-[#090D16]/80 border border-white/[0.06] flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-slate-400">
                   <div className="flex items-center gap-2">
-                    <Server className="w-3.5 h-3.5 text-cyan-400" />
+                    <Server className={`w-3.5 h-3.5 ${activeProf.theme.textAccent} transition-colors duration-300`} />
                     <span>Backend: <code className="text-cyan-300">{getApiBaseUrl()}</code></span>
                     {sessionId && <span className="text-slate-500">• ID: {sessionId}</span>}
                   </div>
@@ -460,11 +487,14 @@ export default function App() {
       </main>
 
       {/* Simplified Clean Footer */}
-      <footer className="border-t border-white/[0.08] bg-[#090D16] py-6 px-4 text-center text-xs text-slate-500 relative z-10 flex flex-col sm:flex-row items-center justify-between max-w-5xl mx-auto w-full">
+      <footer className="border-t border-white/[0.08] bg-[#090D16] py-6 px-4 text-center text-xs text-slate-500 relative z-10 flex flex-col sm:flex-row items-center justify-between max-w-5xl mx-auto w-full transition-colors duration-300">
         <div className="flex items-center gap-2">
-          <BookOpen className="w-4 h-4 text-cyan-400" />
+          <BookOpen className={`w-4 h-4 ${activeProf.theme.textAccent} transition-colors duration-300`} />
           <span className="font-semibold text-slate-300">Agentic Mode-AI</span>
           <span>• Research &amp; Knowledge Agent</span>
+          <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${activeProf.theme.badgeBg}`}>
+            {activeProf.icon} {activeProf.label} Mode
+          </span>
         </div>
         <div className="flex items-center gap-2 text-[11px] text-slate-500 mt-2 sm:mt-0 font-sans">
           <button

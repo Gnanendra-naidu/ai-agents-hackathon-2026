@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
   Search,
   Globe,
@@ -11,19 +11,15 @@ import {
   Loader2,
   Upload,
   Send,
-  Zap
+  Zap,
+  Briefcase
 } from 'lucide-react';
-
-const JUDGE_DEMO_PRESETS = [
-  'Compare multi-agent AI latency & costs',
-  'How do human-in-the-loop guardrails reduce hallucinations?',
-  'Analyze attached benchmark notes vs academic papers',
-];
+import { PROFESSIONS, getProfessionById } from '../constants/professions';
 
 export default function GoalInputPanel({
   researchQuestion = '',
   onQuestionChange,
-  targetAudience = 'Researchers',
+  targetAudience = 'Students',
   onAudienceChange,
   sourceTypes = { webSearch: true, knowledgeBase: true },
   onSourceTypeToggle,
@@ -44,6 +40,15 @@ export default function GoalInputPanel({
   const [newNoteTitle, setNewNoteTitle] = useState('');
   const [newNoteContent, setNewNoteContent] = useState('');
   const fileInputRef = useRef(null);
+
+  const activeProf = getProfessionById(targetAudience);
+
+  // Sync initial question if empty
+  useEffect(() => {
+    if (!researchQuestion) {
+      onQuestionChange?.(activeProf.defaultQuestion);
+    }
+  }, [activeProf.id, activeProf.defaultQuestion, onQuestionChange, researchQuestion]);
 
   const handleFileUpload = (e) => {
     const files = Array.from(e.target.files || []);
@@ -108,60 +113,81 @@ export default function GoalInputPanel({
     setFollowUpText('');
   };
 
-  return (
-    <div className="bg-[#111827]/85 border border-white/[0.08] hover:border-white/[0.12] rounded-2xl p-5 sm:p-6 shadow-2xl backdrop-blur-xl transition-all space-y-5">
-      {/* 1. Header with Audience Selector */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <label htmlFor="research-question" className="text-base sm:text-lg font-bold text-slate-100 flex items-center gap-2">
-          <Search className="w-5 h-5 text-cyan-400" />
-          <span>What would you like to research?</span>
-        </label>
+  const handleProfessionSelect = (profId) => {
+    const prof = getProfessionById(profId);
+    onAudienceChange?.(prof.value);
+    onQuestionChange?.(prof.defaultQuestion);
+  };
 
-        {/* Audience Selector */}
-        <div className="flex items-center gap-2 text-xs">
-          <span className="text-slate-400 font-medium">Who is this report for?</span>
-          <div className="flex items-center gap-1 bg-[#090D16] p-1 rounded-xl border border-white/[0.06]">
-            {['Researchers', 'Founders', 'Students', 'Journalists'].map((aud) => (
-              <button
-                key={aud}
-                type="button"
-                onClick={() => onAudienceChange?.(aud)}
-                className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${
-                  targetAudience === aud
-                    ? 'bg-gradient-to-r from-cyan-600 to-teal-600 text-white shadow-md shadow-cyan-600/30'
-                    : 'text-slate-400 hover:text-slate-200'
-                }`}
-              >
-                {aud}
-              </button>
-            ))}
+  return (
+    <div className={`bg-[#111827]/90 border border-white/[0.08] ${activeProf.theme.cardHover} rounded-2xl p-5 sm:p-6 shadow-2xl backdrop-blur-xl transition-all duration-300 space-y-5`}>
+      {/* 1. Header with Profession Dropdown & Dynamic Mode Banner */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-1 border-b border-white/[0.06]">
+        <div>
+          <label htmlFor="research-question" className="text-base sm:text-lg font-bold text-slate-100 flex items-center gap-2">
+            <Search className={`w-5 h-5 ${activeProf.theme.textAccent} transition-colors duration-300`} />
+            <span>What would you like to research?</span>
+          </label>
+          <p className="text-xs text-slate-400 mt-0.5">
+            Targeting report style &amp; focus for: <strong className={`${activeProf.theme.textAccent} transition-colors duration-300`}>{activeProf.description}</strong>
+          </p>
+        </div>
+
+        {/* Clean Profession Dropdown Selector */}
+        <div className="flex flex-wrap items-center gap-2.5">
+          <label htmlFor="profession-dropdown" className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+            <Briefcase className="w-3.5 h-3.5 text-slate-400" />
+            <span>Select Your Profession:</span>
+          </label>
+
+          <div className="relative">
+            <select
+              id="profession-dropdown"
+              value={activeProf.id}
+              onChange={(e) => handleProfessionSelect(e.target.value)}
+              className={`bg-[#090D16] text-xs font-bold text-slate-100 border border-white/[0.12] rounded-xl px-3 py-2 focus:outline-none transition-all duration-300 cursor-pointer shadow-inner pr-8 ${activeProf.theme.focusRing}`}
+            >
+              {PROFESSIONS.map((p) => (
+                <option key={p.id} value={p.id} className="bg-[#090D16] text-slate-200 py-1.5 font-sans">
+                  {p.icon} {p.label}
+                </option>
+              ))}
+            </select>
           </div>
+
+          {/* Active Mode Badge Pill */}
+          <span
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border transition-all duration-300 shadow-sm ${activeProf.theme.badgeBg}`}
+          >
+            <span>{activeProf.icon}</span>
+            <span>{activeProf.tag}</span>
+          </span>
         </div>
       </div>
 
-      {/* 2. Main Question Textarea */}
+      {/* 2. Main Question Textarea with Dynamic Border / Focus Ring */}
       <textarea
         id="research-question"
         rows="3"
         value={researchQuestion}
         onChange={(e) => onQuestionChange?.(e.target.value)}
-        placeholder="Ask a question (e.g., What are the pros and cons of multi-agent AI?)"
+        placeholder={`Ask a question (e.g., ${activeProf.defaultQuestion})`}
         disabled={isSearching}
-        className="w-full bg-[#090D16]/90 border border-white/[0.08] rounded-xl p-4 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/40 focus:border-cyan-500/80 transition-all resize-none disabled:opacity-60 leading-relaxed"
+        className={`w-full bg-[#090D16]/90 border border-white/[0.08] rounded-xl p-4 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 ${activeProf.theme.focusRing} transition-all duration-300 resize-none disabled:opacity-60 leading-relaxed`}
       />
 
-      {/* 3. One-Click Judge Demo Presets */}
+      {/* 3. Dynamic Clickable Sample Prompts for Chosen Profession */}
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-xs text-amber-400 font-semibold flex items-center gap-1.5 mr-1">
+        <span className={`text-xs font-bold flex items-center gap-1.5 mr-1 ${activeProf.theme.textAccent} transition-colors duration-300`}>
           <Zap className="w-3.5 h-3.5 fill-current" />
-          <span>Judge Demo Presets:</span>
+          <span>Recommended for {activeProf.label}:</span>
         </span>
-        {JUDGE_DEMO_PRESETS.map((prompt, idx) => (
+        {activeProf.samplePrompts.map((prompt, idx) => (
           <button
             key={idx}
             type="button"
             onClick={() => onQuestionChange?.(prompt)}
-            className="text-xs px-3 py-1.5 rounded-full bg-[#161F33] hover:bg-[#1E293B] text-slate-300 hover:text-cyan-300 border border-white/[0.08] hover:border-cyan-500/50 transition-all active:scale-95 text-left flex items-center gap-1.5 shadow-sm"
+            className={`text-xs px-3 py-1.5 rounded-full bg-[#161F33] hover:bg-[#1E293B] text-slate-300 ${activeProf.theme.presetBorder} border border-white/[0.08] transition-all duration-200 active:scale-95 text-left flex items-center gap-1.5 shadow-sm`}
           >
             <span>{prompt}</span>
           </button>
@@ -170,7 +196,7 @@ export default function GoalInputPanel({
 
       {/* 4. Sources Checkboxes & Document Uploads */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
-        {/* Clean Source Checkboxes */}
+        {/* Source Checkboxes */}
         <div className="p-3.5 rounded-xl bg-[#090D16]/75 border border-white/[0.06] flex flex-col justify-between">
           <span className="text-xs font-semibold text-slate-300 block mb-2.5">
             Search Sources:
@@ -306,7 +332,7 @@ export default function GoalInputPanel({
         </div>
       </div>
 
-      {/* 5. Bottom Actions: Follow-Up & Primary Start Button */}
+      {/* 5. Bottom Actions: Follow-Up & Primary Start Button Styled by Theme */}
       <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-t border-white/[0.06]">
         {/* Follow-up question bar */}
         <form onSubmit={handleFollowUpSubmit} className="flex-1 flex items-center gap-2">
@@ -317,36 +343,36 @@ export default function GoalInputPanel({
             disabled={isSearching}
             placeholder={
               hasActiveSession
-                ? 'Ask a follow-up question about this report...'
+                ? `Ask a follow-up question for ${activeProf.label}...`
                 : 'Start research above first, then ask follow-ups here...'
             }
-            className="flex-1 bg-[#090D16] border border-white/[0.08] rounded-xl px-3.5 py-2.5 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-cyan-500/50 disabled:opacity-40"
+            className={`flex-1 bg-[#090D16] border border-white/[0.08] rounded-xl px-3.5 py-2.5 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-1 ${activeProf.theme.focusRing} disabled:opacity-40 transition-colors duration-300`}
           />
           <button
             type="submit"
             disabled={!followUpText.trim() || isSearching}
-            className="p-2.5 rounded-xl bg-[#161F33] hover:bg-cyan-950 text-slate-300 hover:text-cyan-300 border border-white/[0.08] transition-colors disabled:opacity-40"
+            className={`p-2.5 rounded-xl bg-[#161F33] hover:bg-[#1E293B] text-slate-300 ${activeProf.theme.textAccent} border border-white/[0.08] transition-colors disabled:opacity-40`}
             title="Send follow-up query"
           >
             <Send className="w-4 h-4" />
           </button>
         </form>
 
-        {/* Big Friendly Primary CTA */}
+        {/* Big Friendly Primary CTA Dynamically Colored */}
         <button
           type="button"
           onClick={handleLaunchClick}
           disabled={!researchQuestion.trim() || isSearching}
-          className="flex items-center justify-center gap-2.5 px-8 py-3 rounded-xl font-bold text-sm bg-gradient-to-r from-cyan-500 via-teal-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-white shadow-xl shadow-cyan-500/25 hover:shadow-cyan-500/40 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+          className={`flex items-center justify-center gap-2.5 px-8 py-3 rounded-xl font-bold text-sm ${activeProf.theme.buttonPrimary} shadow-xl transition-all duration-300 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0`}
         >
           {isSearching ? (
             <>
-              <Loader2 className="w-4 h-4 animate-spin text-white" />
-              <span>Researching...</span>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span>Researching for {activeProf.label}...</span>
             </>
           ) : (
             <>
-              <span>Start Research</span>
+              <span>Start {activeProf.label} Research</span>
               <ArrowRight className="w-4 h-4" />
             </>
           )}

@@ -1,0 +1,133 @@
+// Configuration for dynamic professions, badges, color themes, and sample presets
+
+export const PROFESSIONS = [
+  {
+    id: 'students',
+    value: 'Students',
+    label: 'Students',
+    icon: '🎓',
+    tag: '🎓 Mode: Students',
+    description: 'Study concepts, exam prep & digestible explanations',
+    theme: {
+      name: 'emerald',
+      primaryHex: '#10B981',
+      accentGradient: 'from-emerald-500 via-teal-500 to-cyan-500',
+      badgeBg: 'bg-emerald-950/70 border-emerald-500/60 text-emerald-300 shadow-emerald-500/20',
+      heroTag: 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400',
+      activeTab: 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/30',
+      buttonPrimary: 'bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 shadow-emerald-500/25',
+      glowTop: 'bg-emerald-600/[0.12]',
+      glowBottom: 'bg-teal-600/[0.08]',
+      focusRing: 'focus:ring-emerald-500/40 focus:border-emerald-500',
+      textAccent: 'text-emerald-400',
+      borderAccent: 'border-emerald-500/40',
+      cardHover: 'hover:border-emerald-500/30',
+      presetBorder: 'hover:border-emerald-500/50 hover:text-emerald-300',
+    },
+    samplePrompts: [
+      'Explain multi-agent AI with simple real-world study analogies',
+      'What are the key trade-offs between centralized and decentralized AI agents for exams?',
+      'How do hallucination guardrails work in beginner terms with examples?',
+    ],
+    defaultQuestion: 'Explain multi-agent AI with simple real-world study analogies',
+  },
+  {
+    id: 'researchers',
+    value: 'Researchers',
+    label: 'Researchers',
+    icon: '🔬',
+    tag: '🔬 Mode: Researchers',
+    description: 'Scholarly citations, empirical benchmarks & peer review rigour',
+    theme: {
+      name: 'indigo',
+      primaryHex: '#4F46E5',
+      accentGradient: 'from-indigo-600 via-blue-600 to-violet-600',
+      badgeBg: 'bg-indigo-950/70 border-indigo-500/60 text-indigo-300 shadow-indigo-500/20',
+      heroTag: 'bg-indigo-500/10 border-indigo-500/30 text-indigo-400',
+      activeTab: 'bg-indigo-600 text-white font-bold shadow-md shadow-indigo-600/30',
+      buttonPrimary: 'bg-gradient-to-r from-indigo-600 via-blue-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white shadow-indigo-600/25',
+      glowTop: 'bg-indigo-600/[0.12]',
+      glowBottom: 'bg-blue-600/[0.08]',
+      focusRing: 'focus:ring-indigo-500/40 focus:border-indigo-500',
+      textAccent: 'text-indigo-400',
+      borderAccent: 'border-indigo-500/40',
+      cardHover: 'hover:border-indigo-500/30',
+      presetBorder: 'hover:border-indigo-500/50 hover:text-indigo-300',
+    },
+    samplePrompts: [
+      'Synthesize empirical benchmark papers on multi-agent consensus latency',
+      'Compare token expenditure overhead in hierarchical vs mesh agent topologies',
+      'Evaluate human-in-the-loop verification methods against recent academic benchmarks',
+    ],
+    defaultQuestion: 'Synthesize empirical benchmark papers on multi-agent consensus latency',
+  },
+  {
+    id: 'founders',
+    value: 'Founders',
+    label: 'Founders',
+    icon: '🚀',
+    tag: '🚀 Mode: Founders',
+    description: 'Market viability, unit economics, ROI & competitor moat',
+    theme: {
+      name: 'amber',
+      primaryHex: '#F59E0B',
+      accentGradient: 'from-amber-500 via-orange-500 to-amber-600',
+      badgeBg: 'bg-amber-950/70 border-amber-500/60 text-amber-300 shadow-amber-500/20',
+      heroTag: 'bg-amber-500/10 border-amber-500/30 text-amber-400',
+      activeTab: 'bg-amber-500 text-slate-950 font-bold shadow-md shadow-amber-500/30',
+      buttonPrimary: 'bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-400 hover:to-orange-400 text-slate-950 shadow-amber-500/25',
+      glowTop: 'bg-amber-600/[0.12]',
+      glowBottom: 'bg-orange-600/[0.08]',
+      focusRing: 'focus:ring-amber-500/40 focus:border-amber-500',
+      textAccent: 'text-amber-400',
+      borderAccent: 'border-amber-500/40',
+      cardHover: 'hover:border-amber-500/30',
+      presetBorder: 'hover:border-amber-500/50 hover:text-amber-300',
+    },
+    samplePrompts: [
+      'What are the commercial ROI and unit economics of deploying autonomous AI agents in production?',
+      'Analyze enterprise willingness-to-pay and pricing moats for verified AI research platforms',
+      'Compare open-source vs proprietary agent frameworks for seed-stage startups',
+    ],
+    defaultQuestion: 'What are the commercial ROI and unit economics of deploying autonomous AI agents in production?',
+  },
+  {
+    id: 'journalists',
+    value: 'Journalists',
+    label: 'Journalists',
+    icon: '📰',
+    tag: '📰 Mode: Journalists',
+    description: 'Fact-checking, claim verification, conflict analysis & source scrutiny',
+    theme: {
+      name: 'crimson',
+      primaryHex: '#E11D48',
+      accentGradient: 'from-rose-600 via-red-600 to-pink-600',
+      badgeBg: 'bg-rose-950/70 border-rose-500/60 text-rose-300 shadow-rose-500/20',
+      heroTag: 'bg-rose-500/10 border-rose-500/30 text-rose-400',
+      activeTab: 'bg-rose-600 text-white font-bold shadow-md shadow-rose-600/30',
+      buttonPrimary: 'bg-gradient-to-r from-rose-600 via-red-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white shadow-rose-600/25',
+      glowTop: 'bg-rose-600/[0.12]',
+      glowBottom: 'bg-red-600/[0.08]',
+      focusRing: 'focus:ring-rose-500/40 focus:border-rose-500',
+      textAccent: 'text-rose-400',
+      borderAccent: 'border-rose-500/40',
+      cardHover: 'hover:border-rose-500/30',
+      presetBorder: 'hover:border-rose-500/50 hover:text-rose-300',
+    },
+    samplePrompts: [
+      'Fact-check major public claims regarding AI agent autonomy vs actual capabilities',
+      'Investigate reported conflicts and data discrepancies between AI benchmarks and field telemetry',
+      'Audit safety guardrail failures and oversight loopholes in published AI agent trials',
+    ],
+    defaultQuestion: 'Fact-check major public claims regarding AI agent autonomy vs actual capabilities',
+  },
+];
+
+export const getProfessionById = (idOrValue) => {
+  if (!idOrValue) return PROFESSIONS[0];
+  const query = String(idOrValue).toLowerCase();
+  return (
+    PROFESSIONS.find((p) => p.id === query || p.value.toLowerCase() === query) ||
+    PROFESSIONS[0]
+  );
+};
