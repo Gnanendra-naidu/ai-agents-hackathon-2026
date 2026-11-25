@@ -26,7 +26,7 @@ export default function Navbar({
           <div>
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-base font-bold tracking-tight text-white flex items-center gap-1.5">
-                AgentFlow <span className="text-cyan-400 font-medium">Studio</span>
+                Agentic <span className="text-cyan-400 font-medium">Mode-AI</span>
               </span>
               <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-cyan-950/90 text-cyan-300 border border-cyan-700/80 shadow-sm shadow-cyan-950/50">
                 Theme 4: Research & Knowledge Agent

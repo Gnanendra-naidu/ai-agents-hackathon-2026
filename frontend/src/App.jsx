@@ -435,7 +435,7 @@ export default function App() {
       <footer className="border-t border-white/[0.08] bg-[#090D16] py-6 px-4 text-center text-xs text-slate-500 relative z-10 flex flex-col sm:flex-row items-center justify-between max-w-7xl mx-auto w-full">
         <div className="flex items-center gap-2">
           <BookOpen className="w-4 h-4 text-cyan-400" />
-          <span className="font-semibold text-slate-400">AgentFlow Studio</span>
+          <span className="font-semibold text-slate-400">Agentic Mode-AI</span>
           <span>• Theme 4: Research & Knowledge Agent</span>
         </div>
         <div className="flex items-center gap-3 text-[11px] text-slate-500 mt-2 sm:mt-0 font-mono">

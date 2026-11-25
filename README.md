@@ -1,4 +1,4 @@
-# AgentFlow Studio – Theme 4: Research & Knowledge Agent
+# Agentic Mode-AI – Theme 4: Research & Knowledge Agent
 
 > **12-Hour AI Agents Hackathon Project**  
 > An autonomous, goal-directed research and knowledge discovery system featuring sub-question decomposition, dual real tool integration, conflicting information detection, verifiable academic citations, and human-in-the-loop approval gates.
@@ -13,7 +13,7 @@ In modern research workflows, users face significant challenges:
 3. **Information Contradictions**: High-velocity domains often present conflicting data that typical AI chatbots blindly amalgamate without flagging.
 4. **Unchecked Destructive Actions**: Autonomous agents publishing findings or triggering external broadcasts without editorial approval present high liability risks.
 
-**AgentFlow Studio (Theme 4: Research & Knowledge Agent)** solves these challenges by implementing an autonomous, observable agent loop that:
+**Agentic Mode-AI (Theme 4: Research & Knowledge Agent)** solves these challenges by implementing an autonomous, observable agent loop that:
 - Decomposes complex research queries into structured sub-questions with dedicated verification states.
 - Executes real tools across external knowledge sources (live Wikipedia API, Crossref Academic Index) and internal document corpora.
 - Flags contradictory evidence across multi-source findings with explicit conflict resolution warnings.
