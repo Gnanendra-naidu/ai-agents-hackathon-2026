@@ -10,13 +10,14 @@ import {
   Trash2,
   Loader2,
   Upload,
-  Send
+  Send,
+  Zap
 } from 'lucide-react';
 
-const EXAMPLE_PROMPTS = [
-  'What are the pros and cons of multi-agent AI?',
-  'How does AI self-reflection reduce hallucination?',
-  'What are the latest breakthroughs in agent memory architectures?',
+const JUDGE_DEMO_PRESETS = [
+  'Compare multi-agent AI latency & costs',
+  'How do human-in-the-loop guardrails reduce hallucinations?',
+  'Analyze attached benchmark notes vs academic papers',
 ];
 
 export default function GoalInputPanel({
@@ -149,17 +150,20 @@ export default function GoalInputPanel({
         className="w-full bg-[#090D16]/90 border border-white/[0.08] rounded-xl p-4 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/40 focus:border-cyan-500/80 transition-all resize-none disabled:opacity-60 leading-relaxed"
       />
 
-      {/* 3. Try an Example Prompt Pills */}
+      {/* 3. One-Click Judge Demo Presets */}
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-xs text-slate-400 font-medium mr-1">Try an example:</span>
-        {EXAMPLE_PROMPTS.map((prompt, idx) => (
+        <span className="text-xs text-amber-400 font-semibold flex items-center gap-1.5 mr-1">
+          <Zap className="w-3.5 h-3.5 fill-current" />
+          <span>Judge Demo Presets:</span>
+        </span>
+        {JUDGE_DEMO_PRESETS.map((prompt, idx) => (
           <button
             key={idx}
             type="button"
             onClick={() => onQuestionChange?.(prompt)}
-            className="text-xs px-3 py-1.5 rounded-full bg-[#161F33] hover:bg-[#1E293B] text-slate-300 hover:text-cyan-300 border border-white/[0.06] hover:border-cyan-500/40 transition-all active:scale-95 text-left"
+            className="text-xs px-3 py-1.5 rounded-full bg-[#161F33] hover:bg-[#1E293B] text-slate-300 hover:text-cyan-300 border border-white/[0.08] hover:border-cyan-500/50 transition-all active:scale-95 text-left flex items-center gap-1.5 shadow-sm"
           >
-            "{prompt}"
+            <span>{prompt}</span>
           </button>
         ))}
       </div>

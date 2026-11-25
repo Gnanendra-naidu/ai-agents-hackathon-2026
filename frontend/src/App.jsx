@@ -368,6 +368,9 @@ export default function App() {
         {finalReport && (
           <FinalResultPanel
             report={finalReport}
+            metrics={metrics}
+            subQuestionsCount={subQuestions.length || 3}
+            traces={traces}
             onRequestExportApproval={handleRequestExportApproval}
             onSelectFollowUp={handleAskFollowUp}
           />
@@ -384,7 +387,7 @@ export default function App() {
               <div className="flex items-center gap-2">
                 <Terminal className="w-4 h-4 text-cyan-400" />
                 <span className="font-semibold text-slate-300">
-                  {showTechnicalDetails ? 'Hide AI Thinking & Technical Details' : 'Show AI Thinking & Technical Details'}
+                  {showTechnicalDetails ? 'Hide Raw Agent Execution Trace' : 'View Raw Agent Execution Trace'}
                 </span>
                 <span className="text-[11px] font-mono px-2 py-0.5 rounded-md bg-[#090D16] text-slate-400 border border-white/[0.06]">
                   {traces.length} events • {subQuestions.length} sub-questions
